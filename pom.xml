@@ -78,10 +78,10 @@
           <mainClass>OpenRate.OpenRate</mainClass>
           <arguments>
             <argument>-p</argument>
-            <argument>Pixip.properties.xml</argument>
+            <argument>Fuzer.properties.xml</argument>
           </arguments>
         </configuration>
-      </plugin>
+      </plugin>    
     </plugins>
   </build>
 
