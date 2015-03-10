@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration PUBLIC
+  "-//APACHE//DTD LOG4J 1.2//EN" 
+  "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  
+  <appender name="console" class="org.apache.log4j.ConsoleAppender">
+    <param name="Target" value="System.out" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p %c{1}:%L [%t] - %m%n" />
+    </layout>
+  </appender>
+
+  <appender name="rootlogger" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="DatePattern" value="'.'yyyyMMdd"/>
+    <param name="File" value="logs/openrate.log"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %-5p %c{1}:%L - %m%n"/>
+    </layout>
+  </appender>
+  
+  <appender name="frameworklogfile" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="DatePattern" value="'.'yyyyMMdd"/>
+    <param name="File" value="logs/Framework.log"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %-5p %c{1}:%L - %m%n"/>
+    </layout>
+  </appender>
+
+  <appender name="simplepipelogfile" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="DatePattern" value="'.'yyyyMMdd"/>
+    <param name="File" value="logs/SimplePipe.log"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %-5p %c{1}:%L - %m%n"/>
+    </layout>
+  </appender>
+
+  <!-- ******************** Perf4J appenders for OpenRate ******************** -->
+  <appender name="perf4jAppender" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="DatePattern" value="'.'yyyyMMdd" />
+    <param name="File" value="${catalina.base}/logs/openrate-stats.log" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%m%n" />
+    </layout>
+  </appender>
+  
+  <!-- This AsyncCoalescingStatisticsAppender groups StopWatch log messages 
+  into GroupedTimingStatistics messages which it sends on the file appender 
+  defined below -->
+  <appender name="CoalescingStatistics"
+              class="org.perf4j.log4j.AsyncCoalescingStatisticsAppender">
+    <!-- The TimeSlice option is used to determine the time window for which 
+    all received StopWatch logs are aggregated to create a single GroupedTimingStatistics 
+    log. Here we set it to 60 seconds, overriding the default of 30000 ms -->
+    <param name="TimeSlice" value="60000" />
+    <appender-ref ref="perf4jAppender" />
+  </appender>
+
+  <!-- *********************************************************************** -->  
+  <logger name="Framework" additivity="false">
+    <level value="DEBUG" />
+    <appender-ref ref="frameworklogfile" />
+  </logger>
+
+  <logger name="Pipeline.SimplePipe" additivity="false">
+    <level value="DEBUG" />
+    <appender-ref ref="simplepipelogfile" />
+  </logger>
+
+  <!-- *********************************************************************** -->  
+  <logger name="ConsoleLogger">
+    <!-- Used by the application to dynamically add the console appender -->
+    <appender-ref ref="console" />
+  </logger>
+
+  <root>
+    <priority value="INFO" />
+    <appender-ref ref="rootlogger" />
+  </root>
+
+</log4j:configuration>
