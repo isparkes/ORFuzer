@@ -81,7 +81,6 @@ public class DiscountLookup extends AbstractRegexMatch {
 
     ColtRecord CurrentRecord;
     ArrayList<String> Results;
-    int i;
 
     CurrentRecord = (ColtRecord) r;
 
@@ -99,6 +98,11 @@ public class DiscountLookup extends AbstractRegexMatch {
         } catch (NumberFormatException ex) {
           CurrentRecord.addError(new RecordError("ERR_DISCOUNT_LOOKUP", ErrorType.SPECIAL));
         }
+      } else {
+        CurrentRecord.discountRule = "";
+        CurrentRecord.discountRUM = "";
+        CurrentRecord.discountPeriod = "";
+        CurrentRecord.discountInitValue = 0;
       }
     }
     return r;

@@ -56,8 +56,11 @@ package COLT;
 
 import OpenRate.process.AbstractRUMTimeMatch;
 import OpenRate.record.ChargePacket;
+import OpenRate.record.ErrorType;
 import OpenRate.record.RatingRecord;
+import OpenRate.record.RecordError;
 import OpenRate.record.TimePacket;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -95,35 +98,34 @@ import java.util.ArrayList;
 public final class ColtRecord extends RatingRecord {
 
   private static final long serialVersionUID = 1L;
-	
+
   // Record type - used to quickly locate records for rating later
   public static final int COLT_RECORD_TYPE = 20;
-  
+
   // Fields in original COLT cdr
 
   /*
-  #0 BCN (supplier contract)
-  #1 Invoice number
-  #2 Local area code of Subscription
-  #3 Subscription without local area code
-  #4 Origin number including extension without leading 0
-  #5 Date
-  #6 Start time including hundreds of second
-  #7 Name of destination
-  #8 Band
-  #9 Dialed Number
-  #10 Duration in seconds
-  #11 Invoice amount
-  #12 Discount
-  #13 Invoice Date
-  #14 Currency
-  #15 Destination number
-  #16 Call Type (Service Class)
-  #17 Tariff Class
-  #18 Origin in case of IN Calls
-  #19 IN SAN
-*/
-  
+   #0 BCN (supplier contract)
+   #1 Invoice number
+   #2 Local area code of Subscription
+   #3 Subscription without local area code
+   #4 Origin number including extension without leading 0
+   #5 Date
+   #6 Start time including hundreds of second
+   #7 Name of destination
+   #8 Band
+   #9 Dialed Number
+   #10 Duration in seconds
+   #11 Invoice amount
+   #12 Discount
+   #13 Invoice Date
+   #14 Currency
+   #15 Destination number
+   #16 Call Type (Service Class)
+   #17 Tariff Class
+   #18 Origin in case of IN Calls
+   #19 IN SAN
+   */
   public static final int BCN_IDX = 0;
   public static final int INVOICE_IDX = 1;
   public static final int SUBSCRIBER_AREA_IDX = 2;
@@ -144,13 +146,13 @@ public final class ColtRecord extends RatingRecord {
   public static final int TARIFF_CLASS_IDX = 17;
   public static final int IN_ORIGIN_IDX = 18;
   public static final int IN_SAN_IDX = 19;
-    
+
   // Worker variables to save references during processing.
   public int RecordType;
 
   // original parsed cdr fields
   public String subscriberNumber = null;
-  public String dialedNumber = null;  
+  public String dialedNumber = null;
   public int billsec = 0;
   public String callType = null;
   public SimpleDateFormat month;
@@ -161,13 +163,13 @@ public final class ColtRecord extends RatingRecord {
   public String Destination = null;
   public String CallCase = null;
   public double RatedAmount = 0;
-  
+
   // Discount stuff - inputs
   public String discount;         // The discount we want to apply
   public String discountRUM;      // The RUM we want to discount
   public String discountPeriod;   // The counter period, M = month, D = day
   public double discountInitValue;// The starting value of the counter
-  
+
   // Discount stuff - results
   public boolean discountApplied;
   public double discountGranted;
@@ -175,7 +177,7 @@ public final class ColtRecord extends RatingRecord {
   public String discountRule;
   public long balanceGroup;
   public int discountCounter;
-  
+
   /**
    * Default Constructor for SimpleRecord.
    */
@@ -189,7 +191,8 @@ public final class ColtRecord extends RatingRecord {
    * Overloaded Constructor for SimpleRecord.
    *
    * @param OriginalData - the flat record we are to map
-   * */
+   *
+   */
   public ColtRecord(String OriginalData) {
     super();
 //    month = new SimpleDateFormat("yyyy-MM");
@@ -198,8 +201,6 @@ public final class ColtRecord extends RatingRecord {
     // Set the data we received
     this.setOriginalData(OriginalData);
   }
-
-
 
   public void mapData() {
     // Set the recoprd type - this helps us separate headers/trailers 
@@ -212,38 +213,49 @@ public final class ColtRecord extends RatingRecord {
     subscriberNumber = getField(SUBSCRIBER_AREA_IDX) + getField(SUBSCRIBER_LOCAL_IDX);
 
     dialedNumber = getField(DIALED_NUMBER_IDX);
- /*   
-    try {
-    	month.parse(getField(DATE_IDX));
-	} catch (ParseException e) {
-		addError(new RecordError("ERR_DATE_INVALID", ErrorType.DATA_VALIDATION));
-	}
-	*/
+    /*   
+     try {
+     month.parse(getField(DATE_IDX));
+     } catch (ParseException e) {
+     addError(new RecordError("ERR_DATE_INVALID", ErrorType.DATA_VALIDATION));
+     }
+     */
     billsec = Integer.parseInt(getField(DURATION_SECS_IDX));
     callType = getField(CALL_TYPE_IDX);
-    
+
+    // Get the event date
+    SimpleDateFormat sdfInput = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    try {
+      EventStartDate = sdfInput.parse(getField(DATE_IDX) + " " + getField(TIME_IDX));
+      UTCEventDate = EventStartDate.getTime() / 1000;
+    } catch (ParseException ex) {
+      RecordError tmpError = new RecordError("ERR_DATE_INVALID", ErrorType.DATA_VALIDATION);
+      tmpError.setModuleName("ErgatelRecord");
+      addError(tmpError);
+    }
+
     // Set the Duration RUM
     setRUMValue("DUR", billsec);
-    
+
     // Add a charge packet
     ChargePacket tmpCP = new ChargePacket();
-    
+
     // Mark the charge packet as a "Retail" packet
     tmpCP.packetType = "R";
 
     // Set the zone model - Assuming we have a standard zone model
-    tmpCP.zoneModel    = "Default";
-    
+    tmpCP.zoneModel = "Default";
+
     // We need this for the PriceLookup
     tmpCP.ratePlanName = "Default";
-    
+
     // Set the service to something reasonable
-    tmpCP.service      = "TEL";
-    
+    tmpCP.service = "TEL";
+
     // Set the time model AND the result (we will skip time lookup at the moment)
-    tmpCP.timeModel    = "Default";
+    tmpCP.timeModel = "Default";
     tmpCP.timeSplitting = AbstractRUMTimeMatch.TIME_SPLITTING_NO_CHECK;
-    
+
     // Set up the time packet as if we did the time lookup (just enough to make it work)
     TimePacket tmpTZ = new TimePacket();
     tmpTZ.timeModel = "Default";
@@ -266,22 +278,26 @@ public final class ColtRecord extends RatingRecord {
     StringBuilder buf = new StringBuilder(1024);
 
     /*write the destination information back
-    this.setField(ACCOUNT_IDX, Account);
-    this.setField(DESTINATION_IDX, Destination);
-    */
-    
+     this.setField(ACCOUNT_IDX, Account);
+     this.setField(DESTINATION_IDX, Destination);
+     */
     buf.append(this.fields[0]);
     for (i = 1; i < this.fields.length; i++) {
-    	buf.append(";");
-    	buf.append(this.fields[i]);
+      buf.append(";");
+      buf.append(this.fields[i]);
     }
-    buf.append(";"); buf.append(this.dialedNumberNorm);
-    buf.append(";"); buf.append(this.Destination);
-    buf.append(";"); buf.append(this.Account);
-    buf.append(";"); buf.append(this.RatedAmount);
+    buf.append(";");
+    buf.append(this.dialedNumberNorm);
+    buf.append(";");
+    buf.append(this.Destination);
+    buf.append(";");
+    buf.append(this.Account);
+    buf.append(";");
+    buf.append(this.RatedAmount);
     if (this.isErrored()) {
-    	buf.append(";"); buf.append(this.getErrors().get(0).getMessage());    	
-    }    
+      buf.append(";");
+      buf.append(this.getErrors().get(0).getMessage());
+    }
     return buf.toString();
   }
 
@@ -296,29 +312,37 @@ public final class ColtRecord extends RatingRecord {
     ArrayList<String> tmpDumpList;
     tmpDumpList = new ArrayList<>();
 
-      tmpDumpList.add("============ BEGIN RECORD ============");
-      tmpDumpList.add("  Record Number            = <" + this.RecordNumber + ">");
-      tmpDumpList.add("--------------------------------------");
-      tmpDumpList.add("  Subscriber Number        = <" + this.subscriberNumber + ">");
-      tmpDumpList.add("  Dialed Number            = <" + this.dialedNumber + ">");
-      tmpDumpList.add("  Call Type                = <" + this.callType + ">");
-      tmpDumpList.add("  Duration (billsec)       = <" + this.billsec + ">");
-      tmpDumpList.add("  Month                    = <" + this.month + ">");
-      tmpDumpList.add("--------------------------------------");
-      tmpDumpList.add("  Normalised Dialed Number = <" + this.dialedNumberNorm + ">");
-      tmpDumpList.add("  Account                  = <" + this.Account + ">");
-      tmpDumpList.add("  Destination              = <" + this.Destination + ">");
-      tmpDumpList.add("  Rated Amount             = <" + this.RatedAmount + ">");
-      tmpDumpList.add("============ END RECORD ==============");
+    tmpDumpList.add("============ BEGIN RECORD ============");
+    tmpDumpList.add("  Record Number            = <" + this.RecordNumber + ">");
+    tmpDumpList.add("--------------------------------------");
+    tmpDumpList.add("  Subscriber Number        = <" + this.subscriberNumber + ">");
+    tmpDumpList.add("  Dialed Number            = <" + this.dialedNumber + ">");
+    tmpDumpList.add("  Call Type                = <" + this.callType + ">");
+    tmpDumpList.add("  Duration (billsec)       = <" + this.billsec + ">");
+    tmpDumpList.add("  Month                    = <" + this.month + ">");
+    tmpDumpList.add("--------------------------------------");
+    tmpDumpList.add("  Normalised Dialed Number = <" + this.dialedNumberNorm + ">");
+    tmpDumpList.add("  Account                  = <" + this.Account + ">");
+    tmpDumpList.add("  Destination              = <" + this.Destination + ">");
+    tmpDumpList.add("  Rated Amount             = <" + this.RatedAmount + ">");
+    tmpDumpList.add("--------------------------------------");
+    tmpDumpList.add("  Discount Rule            = <" + this.discountRule + ">");
+    tmpDumpList.add("  Discount RUM             = <" + this.discountRUM + ">");
+    tmpDumpList.add("  Discount Period          = <" + this.discountPeriod + ">");
+    tmpDumpList.add("  Discount Initial Value   = <" + this.discountInitValue + ">");
+    tmpDumpList.add("--------------------------------------");
+    tmpDumpList.add("  Discount Applied         = <" + this.discountApplied + ">");
+    tmpDumpList.add("  Discount Granted         = <" + this.discountGranted + ">");
+    tmpDumpList.add("============ END RECORD ==============");
 
-      // Get any charge packets
-      tmpDumpList.addAll(this.getChargePacketsDump());
-      
-      // Add balance impacts
-      tmpDumpList.addAll(this.getBalanceImpactsDump());
-      
-      // Use the standard function to get the error information
-      tmpDumpList.addAll(this.getErrorDump());
+    // Get any charge packets
+    tmpDumpList.addAll(this.getChargePacketsDump());
+
+    // Add balance impacts
+    tmpDumpList.addAll(this.getBalanceImpactsDump());
+
+    // Use the standard function to get the error information
+    tmpDumpList.addAll(this.getErrorDump());
 
     return tmpDumpList;
   }

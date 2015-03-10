@@ -92,12 +92,12 @@
       </DiscountLookup>
       
       <!-- Apply any discounts we need to -->
-      <DiscountLookup>
+      <Discount>
         <ClassName>COLT.PromoCalcPreRating</ClassName>
         <Active>True</Active>
         <DataCache>BalCache</DataCache>
         <BatchSize>5000</BatchSize>
-      </DiscountLookup>
+      </Discount>
       
       <!-- Do the rating -->
       <RateLookup>

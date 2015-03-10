@@ -32,7 +32,7 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
 
     if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
       // No discounts found
-      if (CurrentRecord.discount.isEmpty()) {
+      if (CurrentRecord.discountRule == null || CurrentRecord.discountRule.isEmpty()) {
         // no work to do - go home
         return r;
       }
@@ -100,7 +100,7 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
 
         }
       }
-    } else {
+      
       // ******************************** DUR **********************************
       if ((CurrentRecord.discountRUM.equals("DUR")) && (CurrentRecord.getRUMValue("DUR") > 0)) {
         if (CurrentRecord.discountPeriod.equalsIgnoreCase("m")) {
