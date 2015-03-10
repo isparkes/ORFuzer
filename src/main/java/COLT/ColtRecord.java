@@ -220,6 +220,9 @@ public final class ColtRecord extends RatingRecord {
     // Set the zone model - Assuming we have a standard zone model
     tmpCP.zoneModel    = "Default";
     
+    // We need this for the PriceLookup
+    tmpCP.ratePlanName = "Default";
+    
     // Set the service to something reasonable
     tmpCP.service      = "TEL";
     
