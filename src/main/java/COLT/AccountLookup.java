@@ -60,59 +60,46 @@ import OpenRate.record.IRecord;
 import OpenRate.record.RecordError;
 
 /**
- * This class is an example of a plug in that does only a lookup, and thus
- * does not need to be registered as transaction bound. Recall that we will
- * only need to be transaction aware when we need some specific information
- * from the transaction management (e.g. the base file name) or when we
- * require to have the possibility to undo transaction work in the case of
- * some failure.
+ * This class is an example of a plug in that does only a lookup, and thus does
+ * not need to be registered as transaction bound. Recall that we will only need
+ * to be transaction aware when we need some specific information from the
+ * transaction management (e.g. the base file name) or when we require to have
+ * the possibility to undo transaction work in the case of some failure.
  *
  * In this case we do not need it, as the input and output adapters will roll
- * the information back for us (by removing the output stream) in the case of
- * an error.
+ * the information back for us (by removing the output stream) in the case of an
+ * error.
  */
-public class AccountLookup extends AbstractBestMatch
-{
-  /**
-  * This is called when a data record is encountered. You should do any normal
-  * processing here.
-  */
+public class AccountLookup extends AbstractBestMatch {
+
   @Override
-  public IRecord procValidRecord(IRecord r)
-  {	    
+  public IRecord procValidRecord(IRecord r) {
     RecordError tmpError;
-    ColtRecord CurrentRecord = (ColtRecord)r;
+    ColtRecord CurrentRecord = (ColtRecord) r;
 
-    try
-    {
+    if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
+      try {
 
-    	String account = getBestMatch("DEF", CurrentRecord.subscriberNumber);
-        if(account.equalsIgnoreCase("nomatch")) {
-        	throw(new Exception());
-        } 
-        
+        String account = getBestMatch("DEF", CurrentRecord.subscriberNumber);
+        if (account.equalsIgnoreCase("nomatch")) {
+          throw (new Exception());
+        }
+
         CurrentRecord.Account = getBestMatch("DEF", CurrentRecord.subscriberNumber);
 
         getPipeLog().debug("  account lookup <" + CurrentRecord.subscriberNumber + "> = <" + CurrentRecord.Account + ">");
-    }
-    catch (Exception e)
-    {
-      // error detected,
-      tmpError = new RecordError("ERR_ACCOUNT_MATCH_FAILED", ErrorType.SPECIAL);
-      CurrentRecord.addError(tmpError);
+      } catch (Exception e) {
+        // error detected,
+        tmpError = new RecordError("ERR_ACCOUNT_MATCH_FAILED", ErrorType.SPECIAL);
+        CurrentRecord.addError(tmpError);
+      }
     }
 
     return r;
   }
 
-  /**
-  * This is called when a data record with errors is encountered. You should do
-  * any processing here that you have to do for error records, e.g. statistics,
-  * special handling, even error correction!
-  */
   @Override
-  public IRecord procErrorRecord(IRecord r)
-  {
+  public IRecord procErrorRecord(IRecord r) {
     return r;
   }
 }

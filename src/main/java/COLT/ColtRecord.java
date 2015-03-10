@@ -54,7 +54,10 @@
  */
 package COLT;
 
+import OpenRate.process.AbstractRUMTimeMatch;
+import OpenRate.record.ChargePacket;
 import OpenRate.record.RatingRecord;
+import OpenRate.record.TimePacket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -93,6 +96,9 @@ public final class ColtRecord extends RatingRecord {
 
   private static final long serialVersionUID = 1L;
 	
+  // Record type - used to quickly locate records for rating later
+  public static final int COLT_RECORD_TYPE = 20;
+  
   // Fields in original COLT cdr
 
   /*
@@ -140,7 +146,6 @@ public final class ColtRecord extends RatingRecord {
   public static final int IN_SAN_IDX = 19;
     
   // Worker variables to save references during processing.
-
   public int RecordType;
 
   // original parsed cdr fields
@@ -183,7 +188,11 @@ public final class ColtRecord extends RatingRecord {
 
 
   public void mapData() {
+    // Set the recoprd type - this helps us separate headers/trailers 
+    // and different record types later
+    this.RECORD_TYPE = COLT_RECORD_TYPE;
 
+    // Store the original information
     this.fields = this.getOriginalData().split(";");
 
     subscriberNumber = getField(SUBSCRIBER_AREA_IDX) + getField(SUBSCRIBER_LOCAL_IDX);
@@ -198,6 +207,34 @@ public final class ColtRecord extends RatingRecord {
 	*/
     billsec = Integer.parseInt(getField(DURATION_SECS_IDX));
     callType = getField(CALL_TYPE_IDX);
+    
+    // Set the Duration RUM
+    setRUMValue("DUR", billsec);
+    
+    // Add a charge packet
+    ChargePacket tmpCP = new ChargePacket();
+    
+    // Mark the charge packet as a "Retail" packet
+    tmpCP.packetType = "R";
+
+    // Set the zone model - Assuming we have a standard zone model
+    tmpCP.zoneModel    = "Default";
+    
+    // Set the service to something reasonable
+    tmpCP.service      = "TEL";
+    
+    // Set the time model AND the result (we will skip time lookup at the moment)
+    tmpCP.timeModel    = "Default";
+    tmpCP.timeSplitting = AbstractRUMTimeMatch.TIME_SPLITTING_NO_CHECK;
+    
+    // Set up the time packet as if we did the time lookup (just enough to make it work)
+    TimePacket tmpTZ = new TimePacket();
+    tmpTZ.timeModel = "Default";
+    tmpTZ.timeResult = "FLAT";
+
+    // Put this in the record
+    tmpCP.addTimeZone(tmpTZ);
+    addChargePacket(tmpCP);
   }
 
   /**
@@ -257,6 +294,12 @@ public final class ColtRecord extends RatingRecord {
       tmpDumpList.add("  Rated Amount             = <" + this.RatedAmount + ">");
       tmpDumpList.add("============ END RECORD ==============");
 
+      // Get any charge packets
+      tmpDumpList.addAll(this.getChargePacketsDump());
+      
+      // Add balance impacts
+      tmpDumpList.addAll(this.getBalanceImpactsDump());
+      
       // Use the standard function to get the error information
       tmpDumpList.addAll(this.getErrorDump());
 

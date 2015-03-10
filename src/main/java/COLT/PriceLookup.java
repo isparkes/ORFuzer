@@ -1,13 +1,9 @@
 /* ====================================================================
  * Limited Evaluation License:
  *
- * This software is open source, but licensed. The license with this package
- * is an evaluation license, which may not be used for productive systems. If
- * you want a full license, please contact us.
- *
- * The exclusive owner of this work is the OpenRate project.
+ * The exclusive owner of this work is Tiger Shore Management Ltd.
  * This work, including all associated documents and components
- * is Copyright of the OpenRate project 2006-2015.
+ * is Copyright Tiger Shore Management Limited 2006-2010.
  *
  * The following restrictions apply unless they are expressly relaxed in a
  * contractual agreement between the license holder or one of its officially
@@ -34,14 +30,11 @@
  * 8) You agree not to derive other works from the trade secrets in this work,
  *    and that any such derivation may make you liable to pay damages to the
  *    copyright holder
- * 9) You agree to use this software exclusively for evaluation purposes, and
- *    that you shall not use this software to derive commercial profit or
- *    support your business or personal activities.
  *
  * This software is provided "as is" and any expressed or impled warranties,
  * including, but not limited to, the impled warranties of merchantability
  * and fitness for a particular purpose are disclaimed. In no event shall
- * The OpenRate Project or its officially assigned agents be liable to any
+ * Tiger Shore Management or its officially assigned agents be liable to any
  * direct, indirect, incidental, special, exemplary, or consequential damages
  * (including but not limited to, procurement of substitute goods or services;
  * Loss of use, data, or profits; or any business interruption) however caused
@@ -54,40 +47,57 @@
  */
 package COLT;
 
-import OpenRate.process.AbstractBestMatch;
+import OpenRate.process.AbstractRegexMatch;
+import OpenRate.record.ChargePacket;
 import OpenRate.record.ErrorType;
 import OpenRate.record.IRecord;
 import OpenRate.record.RecordError;
+import OpenRate.record.TimePacket;
 
 /**
- * This class is an example of a plug in that does only a lookup, and thus does
- * not need to be registered as transaction bound. Recall that we will only need
- * to be transaction aware when we need some specific information from the
- * transaction management (e.g. the base file name) or when we require to have
- * the possibility to undo transaction work in the case of some failure.
- *
- * In this case we do not need it, as the input and output adapters will roll
- * the information back for us (by removing the output stream) in the case of an
- * error.
+ * Look up the price group for the cases where we have to calculate the retail
+ * price instead of just marking up. This looks up the combination of:
+ *  - tariff
+ *  - zone result
+ *  - time result
+ *  - service
+ * 
+ * To arrive at a price group to be applied.
  */
-public class DestLookup extends AbstractBestMatch {
+public class PriceLookup extends AbstractRegexMatch {
+
+  // Regex search parameters - defined here for performance reasons
+  private final String[] tmpSearchParameters = new String[1];
 
   @Override
   public IRecord procValidRecord(IRecord r) {
+    ColtRecord CurrentRecord = (ColtRecord) r;
 
-    RecordError tmpError;
-
-    ColtRecord CurrentRecord;
-    CurrentRecord = (ColtRecord) r;
-
+    // We only transform the detail records, and leave the others alone
     if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
-      try {
-        CurrentRecord.Destination = getBestMatch("DEF", CurrentRecord.dialedNumberNorm);
-        getPipeLog().debug("  dest lookup <" + CurrentRecord.dialedNumberNorm + "> = <" + CurrentRecord.Destination + ">");
-      } catch (Exception e) {
-        tmpError = new RecordError("ERR_DEST_LOOKUP_FAILED", ErrorType.SPECIAL);
-        CurrentRecord.addError(tmpError);
-      }
+        tmpSearchParameters[0] = CurrentRecord.Destination;
+        
+        // Find the price group and place them into the charge packets
+        for (ChargePacket tmpCP : CurrentRecord.getChargePackets()) {
+          if (tmpCP.Valid) {
+            for (TimePacket tmpTZ : tmpCP.getTimeZones()) {
+              String tmpPriceGroup = getRegexMatch(tmpCP.ratePlanName, tmpSearchParameters);
+
+              if (isValidRegexMatchResult(tmpPriceGroup)) {
+                tmpTZ.priceGroup = tmpPriceGroup;
+              } else {
+                // if this is a base product, error, otherwise turn the CP off
+                if (tmpCP.priority == 0) {
+                  // base product
+                  CurrentRecord.addError(new RecordError("ERR_BASE_PROD_PRICE_MAP", ErrorType.DATA_NOT_FOUND));
+                } else {
+                  // overlay product
+                  tmpCP.Valid = false;
+                }
+              }
+            }
+          }
+        }
     }
 
     return r;

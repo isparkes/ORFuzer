@@ -76,6 +76,13 @@
         <BatchSize>5000</BatchSize>
       </DestLookup>
 
+      <PriceLookup>
+        <ClassName>COLT.PriceLookup</ClassName>
+        <Active>True</Active>
+        <DataCache>PriceLookupCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </PriceLookup>
+      
       <RateLookup>
         <ClassName>COLT.RateLookup</ClassName>
         <Active>True</Active>
@@ -169,6 +176,13 @@
           <RUMMapDataFile>ConfigData/rum.dat</RUMMapDataFile>
         </RateCache>
    
+        <PriceLookupCache>
+          <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/prices.dat</DataFile>
+          <KeyFields>1</KeyFields>
+        </PriceLookupCache>
+
       </CacheableClass>
     </CacheFactory>
   </Resource>
