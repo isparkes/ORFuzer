@@ -162,6 +162,20 @@ public final class ColtRecord extends RatingRecord {
   public String CallCase = null;
   public double RatedAmount = 0;
   
+  // Discount stuff - inputs
+  public String discount;         // The discount we want to apply
+  public String discountRUM;      // The RUM we want to discount
+  public String discountPeriod;   // The counter period, M = month, D = day
+  public double discountInitValue;// The starting value of the counter
+  
+  // Discount stuff - results
+  public boolean discountApplied;
+  public double discountGranted;
+  public long discountRecId;
+  public String discountRule;
+  public long balanceGroup;
+  public int discountCounter;
+  
   /**
    * Default Constructor for SimpleRecord.
    */

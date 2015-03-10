@@ -83,6 +83,23 @@
         <BatchSize>5000</BatchSize>
       </PriceLookup>
       
+      <!-- Look up any discounts to use -->
+      <DiscountLookup>
+        <ClassName>COLT.DiscountLookup</ClassName>
+        <Active>True</Active>
+        <DataCache>DiscountLookupCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </DiscountLookup>
+      
+      <!-- Apply any discounts we need to -->
+      <DiscountLookup>
+        <ClassName>COLT.PromoCalcPreRating</ClassName>
+        <Active>True</Active>
+        <DataCache>BalCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </DiscountLookup>
+      
+      <!-- Do the rating -->
       <RateLookup>
         <ClassName>COLT.RateLookup</ClassName>
         <Active>True</Active>
@@ -182,6 +199,21 @@
           <DataFile>ConfigData/prices.dat</DataFile>
           <KeyFields>1</KeyFields>
         </PriceLookupCache>
+
+        <DiscountLookupCache>
+          <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/discounts.dat</DataFile>
+          <KeyFields>1</KeyFields>
+        </DiscountLookupCache>
+
+        <BalCache>
+          <ClassName>OpenRate.cache.BalanceCache</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/balances.dat</DataFile>
+          <DateFormat>Integer</DateFormat>
+          <SelectStatement>select BALANCE_GROUP,COUNTER_ID,RECORD_ID,VALID_FROM,VALID_TO,CURRENT_BAL from COUNTER_BALS</SelectStatement>
+        </BalCache>
 
       </CacheableClass>
     </CacheFactory>
