@@ -165,7 +165,8 @@
         <RateCache>
           <ClassName>OpenRate.cache.RUMRateCache</ClassName>
           <DataSourceType>File</DataSourceType>
-          <DataFile>ConfigData/rate.dat</DataFile>
+          <PriceModelDataFile>ConfigData/rate.dat</PriceModelDataFile>
+          <RUMMapDataFile>ConfigData/rum.dat</RUMMapDataFile>
         </RateCache>
    
       </CacheableClass>
