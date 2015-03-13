@@ -59,7 +59,7 @@
       <directory>src/main/resources</directory>
       <outputDirectory>properties</outputDirectory>
       <includes>
-        <include>properties.xml</include>
+        <include>Fuzer.properties.xml</include>
         <include>log.properties</include>
         <include>log4j.dtd</include>
       </includes>
