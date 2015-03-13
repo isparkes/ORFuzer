@@ -236,6 +236,7 @@ public final class ColtRecord extends RatingRecord {
 
     // Set the Duration RUM
     setRUMValue("DUR", billsec);
+    setRUMValue("EVT", billsec);
 
     // Add a charge packet
     ChargePacket tmpCP = new ChargePacket();
