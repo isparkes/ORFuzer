@@ -21,13 +21,15 @@ Prerequisites:
 
 Building OpenRate core:
 
-$ git clone git@github.com:isparkes/OpenRate.git
+$ git clone https://github.com/isparkes/OpenRate
 
 $ (cd OpenRate; mvn install)
 
+(followin instructions were tested with OpenRate 1.5.2.3)
+
 Building this project:
 
-$ git clone git@github.com:isparkes/ORFuzer.git
+$ git clone https://github.com/isparkes/ORFuzer
 
 $ (cd ORFuzer; mvn install)
 
