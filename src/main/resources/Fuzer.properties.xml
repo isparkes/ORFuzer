@@ -32,7 +32,7 @@
         <BatchSize>5000</BatchSize>
         <InputFilePath>Data</InputFilePath>
         <InputFilePrefix></InputFilePrefix>
-        <InputFileSuffix>.cat</InputFileSuffix>
+        <InputFileSuffix>.in</InputFileSuffix>
         <DoneFilePath>Data</DoneFilePath>
         <DoneFilePrefix></DoneFilePrefix>
         <DoneFileSuffix>.done</DoneFileSuffix>
@@ -156,6 +156,7 @@
     <ECI>
       <ClassName>OpenRate.configurationmanager.EventHandler</ClassName>
       <Port>8086</Port>
+      <SemaphoreFile>Semaphore.txt</SemaphoreFile>
       <MaxConnection>2</MaxConnection>
     </ECI>
 
