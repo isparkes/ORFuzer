@@ -28,7 +28,7 @@
            record level processing cannot continue, usually triggered explicitly
            in your processing -->
       <SInpAdapter>
-        <ClassName>COLT.ColtInputAdapter</ClassName>
+        <ClassName>escaux.GenericInputAdapter</ClassName>
         <BatchSize>5000</BatchSize>
         <InputFilePath>Data</InputFilePath>
         <InputFilePrefix></InputFilePrefix>
@@ -57,27 +57,48 @@
            your output persistence is and how much memory you want to use for
            the processing. -->
       <Normalisation>
-        <ClassName>COLT.Normalisation</ClassName>
+        <ClassName>escaux.Normalisation</ClassName>
         <DataCache>NormCache</DataCache>
         <BatchSize>5000</BatchSize>
       </Normalisation>
       
+      <ServiceLookup>
+      	<ClassName>escaux.EscauxSimpleLookup</ClassName>
+      	<Active>True</Active>
+        <DataCache>ServiceLookupCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </ServiceLookup>
+      
+      <TypeLookup>
+      	<ClassName>escaux.EscauxSimpleLookup</ClassName>
+      	<Active>True</Active>
+        <DataCache>TypeLookupCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </TypeLookup>
+      
+      <RoamingLookup>
+      	<ClassName>escaux.EscauxSimpleLookup</ClassName>
+      	<Active>True</Active>
+        <DataCache>RoamingLookupCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </RoamingLookup>
+	      
       <AccountLookup>
-        <ClassName>COLT.AccountLookup</ClassName>
+        <ClassName>escaux.AccountLookup</ClassName>
          <Active>True</Active>
         <DataCache>AccountCache</DataCache>
         <BatchSize>5000</BatchSize>
       </AccountLookup>
 
       <DestLookup>
-        <ClassName>COLT.DestLookup</ClassName>
+        <ClassName>escaux.DestLookup</ClassName>
         <Active>True</Active>
         <DataCache>PrefixCache</DataCache>
         <BatchSize>5000</BatchSize>
       </DestLookup>
 
       <PriceLookup>
-        <ClassName>COLT.PriceLookup</ClassName>
+        <ClassName>escaux.PriceLookup</ClassName>
         <Active>True</Active>
         <DataCache>PriceLookupCache</DataCache>
         <BatchSize>5000</BatchSize>
@@ -85,7 +106,7 @@
       
       <!-- Look up any discounts to use -->
       <DiscountLookup>
-        <ClassName>COLT.DiscountLookup</ClassName>
+        <ClassName>escaux.DiscountLookup</ClassName>
         <Active>True</Active>
         <DataCache>DiscountLookupCache</DataCache>
         <BatchSize>5000</BatchSize>
@@ -93,7 +114,7 @@
       
       <!-- Apply any discounts we need to -->
       <Discount>
-        <ClassName>COLT.PromoCalcPreRating</ClassName>
+        <ClassName>escaux.PromoCalcPreRating</ClassName>
         <Active>True</Active>
         <DataCache>BalCache</DataCache>
         <BatchSize>5000</BatchSize>
@@ -101,7 +122,7 @@
       
       <!-- Do the rating -->
       <RateLookup>
-        <ClassName>COLT.RateLookup</ClassName>
+        <ClassName>escaux.RateLookup</ClassName>
         <Active>True</Active>
         <DataCache>RateCache</DataCache>
         <BatchSize>5000</BatchSize>
@@ -132,7 +153,7 @@
            of a transaction rollback, then the file will be renamed to 
            testpipeline*.err. -->
       <SOutAdapter>
-        <ClassName>COLT.CdrdbOutputAdapter</ClassName>
+        <ClassName>escaux.CdrdbOutputAdapter</ClassName>
         <OutputName>default</OutputName>
         <BatchSize>5000</BatchSize>
         <MaxSleep>50</MaxSleep>
@@ -198,7 +219,7 @@
           <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
           <DataSourceType>File</DataSourceType>
           <DataFile>ConfigData/prices.dat</DataFile>
-          <KeyFields>1</KeyFields>
+          <KeyFields>2</KeyFields>
         </PriceLookupCache>
 
         <DiscountLookupCache>
@@ -215,7 +236,34 @@
           <DateFormat>Integer</DateFormat>
           <SelectStatement>select BALANCE_GROUP,COUNTER_ID,RECORD_ID,VALID_FROM,VALID_TO,CURRENT_BAL from COUNTER_BALS</SelectStatement>
         </BalCache>
-
+        
+        <ServiceLookupCache>
+          <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/services.dat</DataFile>
+          <KeyFields>1</KeyFields>
+          <Keys>2</Keys>
+          <Fields>service</Fields>
+        </ServiceLookupCache>
+        
+		<TypeLookupCache>
+          <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/types.dat</DataFile>
+          <KeyFields>1</KeyFields>
+          <Keys>8</Keys>
+          <Fields>type</Fields>
+        </TypeLookupCache>
+        
+        <RoamingLookupCache>
+          <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/roaming.dat</DataFile>
+          <KeyFields>1</KeyFields>
+          <Keys>15</Keys>
+          <Fields>roaming,direction</Fields>
+        </RoamingLookupCache>
+	
       </CacheableClass>
     </CacheFactory>
   </Resource>

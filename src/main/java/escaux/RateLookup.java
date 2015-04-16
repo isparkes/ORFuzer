@@ -1,4 +1,4 @@
-package COLT;
+package escaux;
 
 import OpenRate.process.AbstractRUMRateCalc;
 import OpenRate.record.ChargePacket;
@@ -12,11 +12,11 @@ public class RateLookup extends AbstractRUMRateCalc {
   public IRecord procValidRecord(IRecord r) {
     int Index;
     ChargePacket tmpCP;
-    ColtRecord CurrentRecord;
+    EscauxRecord CurrentRecord;
     RecordError tmpError;
-    CurrentRecord = (ColtRecord) r;
+    CurrentRecord = (EscauxRecord) r;
 
-    if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
+    if (CurrentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
       try {
         performRating(CurrentRecord);
       } catch (Exception e) {
@@ -26,7 +26,7 @@ public class RateLookup extends AbstractRUMRateCalc {
 
       for (Index = 0; Index < CurrentRecord.getChargePacketCount(); Index++) {
         tmpCP = CurrentRecord.getChargePacket(Index);
-        CurrentRecord.RatedAmount += tmpCP.chargedValue;
+        CurrentRecord.ratedAmount += tmpCP.chargedValue;
       }
     }
 

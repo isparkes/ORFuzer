@@ -7,7 +7,7 @@
  *
  * The exclusive owner of this work is the OpenRate project.
  * This work, including all associated documents and components
- * is Copyright of the OpenRate project 2006-2015.
+ * is Copyright of the OpenRate project 2006-2014.
  *
  * The following restrictions apply unless they are expressly relaxed in a
  * contractual agreement between the license holder or one of its officially
@@ -52,54 +52,82 @@
  * Half International.
  * ====================================================================
  */
-package COLT;
+package escaux;
 
-import OpenRate.process.AbstractBestMatch;
-import OpenRate.record.ErrorType;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import OpenRate.adapter.file.FlatFileOutputAdapter;
+import OpenRate.record.FlatRecord;
 import OpenRate.record.IRecord;
-import OpenRate.record.RecordError;
 
 /**
- * This class is an example of a plug in that does only a lookup, and thus does
- * not need to be registered as transaction bound. Recall that we will only need
- * to be transaction aware when we need some specific information from the
- * transaction management (e.g. the base file name) or when we require to have
- * the possibility to undo transaction work in the case of some failure.
- *
- * In this case we do not need it, as the input and output adapters will roll
- * the information back for us (by removing the output stream) in the case of an
- * error.
+ * The Output Adapter is responsible for writing the completed records to the
+ * target file.
  */
-public class AccountLookup extends AbstractBestMatch {
+public class CdrdbOutputAdapter
+        extends FlatFileOutputAdapter {
 
+  /**
+   * We transform the records here so that they are ready to output making any
+   * specific changes to the record that are necessary to make it ready for
+   * output.
+   *
+   * As we are using the FlatFileOutput adapter, we should transform the records
+   * into FlatRecords, storing the data to be written using the setData()
+   * method. This means that we do not have to know about the internal workings
+   * of the output adapter.
+   *
+   * Note that this is just undoing the transformation that we did in the input
+   * adapter.
+   *
+   * @param r
+   * @return
+   */
   @Override
-  public IRecord procValidRecord(IRecord r) {
-    RecordError tmpError;
-    ColtRecord CurrentRecord = (ColtRecord) r;
+  public Collection<IRecord> procValidRecord(IRecord r) {
+    FlatRecord tmpOutRecord;
+    EscauxRecord tmpInRecord;
 
-    if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
-      try {
+    Collection<IRecord> Outbatch;
+    Outbatch = new ArrayList<>();
 
-        String account = getBestMatch("DEF", CurrentRecord.subscriberNumber);
-        if (account.equalsIgnoreCase("nomatch")) {
-          throw (new Exception());
-        }
+    tmpOutRecord = new FlatRecord();
+    tmpInRecord = (EscauxRecord) r;
+    
+    tmpOutRecord.setData(tmpInRecord.unmapOriginalData());
+    Outbatch.add((IRecord) tmpOutRecord);
 
-        CurrentRecord.Account = getBestMatch("DEF", CurrentRecord.subscriberNumber);
+    getPipeLog().debug("writing cdr " + tmpOutRecord.RecordNumber);
 
-        getPipeLog().debug("  account lookup <" + CurrentRecord.subscriberNumber + "> = <" + CurrentRecord.Account + ">");
-      } catch (Exception e) {
-        // error detected,
-        tmpError = new RecordError("ERR_ACCOUNT_MATCH_FAILED", ErrorType.SPECIAL);
-        CurrentRecord.addError(tmpError);
-      }
-    }
-
-    return r;
+    return Outbatch;
   }
 
+  /**
+   * Handle any error records here so that they are ready to output making any
+   * specific changes to the record that are necessary to make it ready for
+   * output.
+   *
+   * @param r
+   * @return
+   */
   @Override
-  public IRecord procErrorRecord(IRecord r) {
-    return r;
+  public Collection<IRecord> procErrorRecord(IRecord r) {
+
+	  FlatRecord tmpOutRecord;
+	    EscauxRecord tmpInRecord;
+
+	    Collection<IRecord> Outbatch;
+	    Outbatch = new ArrayList<>();
+
+	    tmpOutRecord = new FlatRecord();
+	    tmpInRecord = (EscauxRecord) r;
+	    
+	    tmpOutRecord.setData(tmpInRecord.unmapOriginalData());
+	    Outbatch.add((IRecord) tmpOutRecord);
+
+	    getPipeLog().debug("writing error cdr " + tmpOutRecord.RecordNumber);
+
+	    return Outbatch;
   }
 }

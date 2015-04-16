@@ -1,4 +1,4 @@
-package COLT;
+package escaux;
 
 import OpenRate.lang.DiscountInformation;
 import OpenRate.process.AbstractBalanceHandlerPlugIn;
@@ -21,16 +21,16 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
   // -----------------------------------------------------------------------------
   @Override
   public IRecord procValidRecord(IRecord r) {
-    ColtRecord CurrentRecord;
+    EscauxRecord CurrentRecord;
     DiscountInformation tmpDiscInfo;
 
-    CurrentRecord = (ColtRecord) r;
+    CurrentRecord = (EscauxRecord) r;
 
     // Used for balance creation
     long tmpStartDate = 0;
     long tmpEndDate = 0;
 
-    if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
+    if (CurrentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
       // No discounts found
       if (CurrentRecord.discountRule == null || CurrentRecord.discountRule.isEmpty()) {
         // no work to do - go home

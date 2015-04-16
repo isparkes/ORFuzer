@@ -52,7 +52,7 @@
  * Half International.
  * ====================================================================
  */
-package COLT;
+package escaux;
 
 import OpenRate.process.AbstractBestMatch;
 import OpenRate.record.ErrorType;
@@ -77,16 +77,16 @@ public class DestLookup extends AbstractBestMatch {
 
     RecordError tmpError;
 
-    ColtRecord CurrentRecord;
-    CurrentRecord = (ColtRecord) r;
+    EscauxRecord currentRecord;
+    currentRecord = (EscauxRecord) r;
 
-    if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
+    if (currentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
       try {
-        CurrentRecord.Destination = getBestMatch("DEF", CurrentRecord.dialedNumberNorm);
-        getPipeLog().debug("  dest lookup <" + CurrentRecord.dialedNumberNorm + "> = <" + CurrentRecord.Destination + ">");
+        currentRecord.destination = getBestMatch("DEF", currentRecord.dialedNumberNorm);
+        getPipeLog().debug("  dest lookup <" + currentRecord.dialedNumberNorm + "> = <" + currentRecord.destination + ">");
       } catch (Exception e) {
         tmpError = new RecordError("ERR_DEST_LOOKUP_FAILED", ErrorType.SPECIAL);
-        CurrentRecord.addError(tmpError);
+        currentRecord.addError(tmpError);
       }
     }
 

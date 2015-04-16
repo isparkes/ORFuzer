@@ -52,62 +52,83 @@
  * Half International.
  * ====================================================================
  */
-package COLT;
+package escaux;
+
+import java.util.ArrayList;
 
 import OpenRate.process.AbstractRegexMatch;
 import OpenRate.record.ErrorType;
 import OpenRate.record.IRecord;
 import OpenRate.record.RecordError;
 
-import java.util.ArrayList;
-
-/**
- * Select the discount to use for this record.
- *
- * @author ian
- */
-public class DiscountLookup extends AbstractRegexMatch {
+public class Normalisation extends AbstractRegexMatch {
 
   String[] tmpSearchParameters = new String[1];
 
-  // For readability
-  int IDX_RULE = 0;
-  int IDX_RUM = 1;
-  int IDX_PERIOD = 2;
-  int IDX_INITIAL_VALUE = 3;
-
+  /**
+   * This is called when a data record is encountered. You should do any normal
+   * processing here.
+   *
+   * @return
+   */
   @Override
   public IRecord procValidRecord(IRecord r) {
 
-    ColtRecord CurrentRecord;
+    EscauxRecord currentRecord;
     ArrayList<String> Results;
+    int i;
 
-    CurrentRecord = (ColtRecord) r;
+    currentRecord = (EscauxRecord) r;
 
-    if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
+    if (currentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
+      String tmpNumber = currentRecord.dialedNumber;
 
-      tmpSearchParameters[0] = CurrentRecord.Destination;
-      Results = getRegexMatchWithChildData("Default", tmpSearchParameters);
+      getPipeLog().debug("--- start normalize <" + tmpNumber + ">");
 
-      if (this.isValidRegexMatchResult(Results)) {
-        CurrentRecord.discountRule = Results.get(IDX_RULE);
-        CurrentRecord.discountRUM = Results.get(IDX_RUM);
-        CurrentRecord.discountPeriod = Results.get(IDX_PERIOD);
-        try {
-          CurrentRecord.discountInitValue = Double.valueOf(Results.get(IDX_INITIAL_VALUE));
-        } catch (NumberFormatException ex) {
-          CurrentRecord.addError(new RecordError("ERR_DISCOUNT_LOOKUP", ErrorType.SPECIAL));
+      // allow several phases of normalization
+      for (i = 1; i <= 2; i++) {
+
+        tmpSearchParameters[0] = tmpNumber;
+        Results = getRegexMatchWithChildData(Integer.toString(i), tmpSearchParameters);
+        getPipeLog().debug("  iteration " + i + " <" + tmpNumber + ">");
+
+        if ((Results != null)) {
+          if (!Results.get(0).equalsIgnoreCase("nomatch")) {
+            if ((Results.size() > 1)) {
+              if (Results.get(0).isEmpty()) {
+                // just add the prefix
+                tmpNumber = Results.get(1) + tmpNumber;
+                getPipeLog().debug("  -> add prefix <" + Results.get(1) + "> = <" + tmpNumber + ">");
+              } else {
+                // remove an old prefix and add the new prefix
+                tmpNumber = tmpNumber.replaceAll(Results.get(0), Results.get(1));
+                getPipeLog().debug("  -> remove <" + Results.get(0) + "> and add prefix <" + Results.get(1) + "> = <" + tmpNumber + ">");
+              }
+            } else {
+              getPipeLog().debug("  -> error: result size < 2 result(0)=" + Results.get(0));
+              currentRecord.addError(new RecordError("ERR_NORMALISATION_LOOKUP", ErrorType.SPECIAL));
+            }
+          } else {
+            getPipeLog().debug("  -> no match");
+          }
+        } else {
+          getPipeLog().debug("  -> error: result=null");
+          currentRecord.addError(new RecordError("ERR_NORMALISATION_LOOKUP", ErrorType.SPECIAL));
         }
-      } else {
-        CurrentRecord.discountRule = "";
-        CurrentRecord.discountRUM = "";
-        CurrentRecord.discountPeriod = "";
-        CurrentRecord.discountInitValue = 0;
       }
+      currentRecord.dialedNumberNorm = tmpNumber;
+      getPipeLog().debug("--- end normalize <" + tmpNumber + ">");
     }
     return r;
   }
 
+  /**
+   * This is called when a data record with errors is encountered. You should do
+   * any processing here that you have to do for error records, e.g. statistics,
+   * special handling, even error correction!
+   *
+   * @return
+   */
   @Override
   public IRecord procErrorRecord(IRecord r) {
     return r;

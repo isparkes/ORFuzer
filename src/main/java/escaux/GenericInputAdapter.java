@@ -52,11 +52,12 @@
  * Half International.
  * ====================================================================
  */
-package COLT;
+package escaux;
 
 import OpenRate.adapter.file.FlatFileInputAdapter;
 import OpenRate.record.FlatRecord;
 import OpenRate.record.IRecord;
+import artillium.ArtilliumRecord;
 
 /**
  * This class is an example of how one would write an InputAdapter. An input
@@ -67,16 +68,15 @@ import OpenRate.record.IRecord;
  * file, but in this simplest possible case, it just create a bunch of records
  * out of thin air and passes them on to the pipeline.
  */
-public class ColtInputAdapter
+public class GenericInputAdapter
         extends FlatFileInputAdapter {
 
   private int intRecordNumber;
-
   /**
    * Constructor for SimpleInputAdapter.
    */
-  public ColtInputAdapter() {
-    super();
+  public GenericInputAdapter() {
+	  super();
   }
 
   // -----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ public class ColtInputAdapter
   @Override
   public IRecord procValidRecord(IRecord r) {
     String tmpData;
-    ColtRecord tmpDataRecord = null;
+    EscauxRecord tmpDataRecord = null;
     FlatRecord tmpFlatRecord;
     
     /* The source of the record is FlatRecord, because we are using the
@@ -127,33 +127,16 @@ public class ColtInputAdapter
 
     // Get the data we are goingt to work on from the input record
     tmpData = tmpFlatRecord.getData();
-
-    // Determine if there is anything to do (if it is a detail record) and if
-    // there is, do it, otherwise leave things as they are.
-    // For this application, it is enough to know that the record is
-    // not a detail, so if it is not "020" - "060" or "1xx" OR "2xx", ignore it
-    if (tmpData.startsWith("02") | tmpData.startsWith("03")
-            | tmpData.startsWith("04") | tmpData.startsWith("05")
-            | tmpData.startsWith("06") | tmpData.startsWith("1")
-            | tmpData.startsWith("2")) {
-      // Create the container record for processing
-      tmpDataRecord = new ColtRecord();
-
-      // Set the data into the record
-      tmpDataRecord.setOriginalData(tmpData);
-
-      // Map the data, parsing it into the fields
-      tmpDataRecord.mapData();
-
-      // set the record number
-      intRecordNumber++;
-      tmpDataRecord.RecordNumber = intRecordNumber;
-
-      getPipeLog().debug("reading cdr " + intRecordNumber);
-      
-    }
-
-    // Return the modified record in the Common record format (IRecord)
+	tmpDataRecord = new ArtilliumRecord();
+	// Set the data into the record
+	tmpDataRecord.setOriginalData(tmpData);
+	// Map the data, parsing it into the fields
+	tmpDataRecord.mapData();
+	// set the record number
+	intRecordNumber++;
+	tmpDataRecord.RecordNumber = intRecordNumber;
+	getPipeLog().debug("reading cdr " + intRecordNumber);
+// Return the modified record in the Common record format (IRecord)
     return (IRecord) tmpDataRecord;
   }
 
@@ -186,3 +169,4 @@ public class ColtInputAdapter
     return r;
   }
 }
+

@@ -45,7 +45,7 @@
  * Half International.
  * ====================================================================
  */
-package COLT;
+package escaux;
 
 import OpenRate.process.AbstractRegexMatch;
 import OpenRate.record.ChargePacket;
@@ -67,15 +67,16 @@ import OpenRate.record.TimePacket;
 public class PriceLookup extends AbstractRegexMatch {
 
   // Regex search parameters - defined here for performance reasons
-  private final String[] tmpSearchParameters = new String[1];
+  private final String[] tmpSearchParameters = new String[2];
 
   @Override
   public IRecord procValidRecord(IRecord r) {
-    ColtRecord CurrentRecord = (ColtRecord) r;
+    EscauxRecord CurrentRecord = (EscauxRecord) r;
 
     // We only transform the detail records, and leave the others alone
-    if (CurrentRecord.RECORD_TYPE == ColtRecord.COLT_RECORD_TYPE) {
-        tmpSearchParameters[0] = CurrentRecord.Destination;
+    if (CurrentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
+        tmpSearchParameters[0] = CurrentRecord.destination;
+        tmpSearchParameters[1] = CurrentRecord.service;
         
         // Find the price group and place them into the charge packets
         for (ChargePacket tmpCP : CurrentRecord.getChargePackets()) {
