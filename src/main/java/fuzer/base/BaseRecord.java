@@ -1,5 +1,6 @@
 package fuzer.base;
 
+import artillium.ArtilliumDefs;
 import OpenRate.record.BalanceImpact;
 import OpenRate.record.ErrorType;
 import OpenRate.record.RatingRecord;
@@ -171,7 +172,7 @@ public class BaseRecord
    */
   public void mapBaseHeaderRecord(String InputData) {
     OriginalData = InputData;
-    RECORD_TYPE = BaseDefs.BASE_HEADER_TYPE;
+    RECORD_TYPE = ArtilliumDefs.BASE_HEADER_TYPE;
   }
 
   /**
@@ -181,7 +182,7 @@ public class BaseRecord
    */
   public void mapBaseTrailerRecord(String InputData) {
     OriginalData = InputData;
-    RECORD_TYPE = BaseDefs.BASE_TRAILER_TYPE;
+    RECORD_TYPE = ArtilliumDefs.BASE_TRAILER_TYPE;
   }
 
   /**
@@ -194,7 +195,7 @@ public class BaseRecord
     RecordError tmpError;
 
     // For this application, it is enough to know that the record is
-    RECORD_TYPE = BaseDefs.BASE_DETAIL_TYPE;
+    RECORD_TYPE = ArtilliumDefs.BASE_DETAIL_TYPE;
     OriginalData = InputData;
 
     // Detect recycle case, and remove header info
@@ -204,27 +205,27 @@ public class BaseRecord
       StringBuffer record = new StringBuffer(OriginalData);
 
       // remove RecycleTag from record
-      record = record.delete(0, record.indexOf(BaseDefs.BASE_FIELD_SPLITTER) + 1);
+      record = record.delete(0, record.indexOf(ArtilliumDefs.BASE_FIELD_SPLITTER) + 1);
 
       // remove ErrorCode from record
-      record = record.delete(0, record.indexOf(BaseDefs.BASE_FIELD_SPLITTER) + 1);
+      record = record.delete(0, record.indexOf(ArtilliumDefs.BASE_FIELD_SPLITTER) + 1);
 
       // Get the previous recycle count
-      String Recycle_CountStr = record.substring(1, record.indexOf(BaseDefs.BASE_FIELD_SPLITTER));
+      String Recycle_CountStr = record.substring(1, record.indexOf(ArtilliumDefs.BASE_FIELD_SPLITTER));
       recycleCount = Integer.parseInt(Recycle_CountStr);
 
       // remove RecycleCount from record
-      record = record.delete(0, record.indexOf(BaseDefs.BASE_FIELD_SPLITTER) + 2);
+      record = record.delete(0, record.indexOf(ArtilliumDefs.BASE_FIELD_SPLITTER) + 2);
 
       // reset the original data
       OriginalData = record.toString();
     }
 
     // We normally expect 42 fields, old format 41 fields
-    if ((OriginalData.split(BaseDefs.BASE_FIELD_SPLITTER, -1).length == BaseDefs.BASE_DTL_RECORD_FIELD_COUNT) || // new format
-        (OriginalData.split(BaseDefs.BASE_FIELD_SPLITTER, -1).length == BaseDefs.BASE_DTL_RECORD_FIELD_COUNT_8_92)) // Old format
+    if ((OriginalData.split(ArtilliumDefs.BASE_FIELD_SPLITTER, -1).length == ArtilliumDefs.BASE_DTL_RECORD_FIELD_COUNT) || // new format
+        (OriginalData.split(ArtilliumDefs.BASE_FIELD_SPLITTER, -1).length == ArtilliumDefs.BASE_DTL_RECORD_FIELD_COUNT_8_92)) // Old format
     {
-      fields = OriginalData.split(BaseDefs.BASE_FIELD_SPLITTER, -1);
+      fields = OriginalData.split(ArtilliumDefs.BASE_FIELD_SPLITTER, -1);
     } else {
       // default the fields array - stops nasty exceptions later
       fields = new String[41];
@@ -237,7 +238,7 @@ public class BaseRecord
     }
 
     // Check the record type
-    if (getField(BaseDefs.BASE_DTL_RECORD_TYPE_IDX).equals("1") == false) {
+    if (getField(ArtilliumDefs.BASE_DTL_RECORD_TYPE_IDX).equals("1") == false) {
       // Unsupported type
       tmpError = new RecordError("ERR_RECORD_NOT_SUPPORTED", ErrorType.DATA_VALIDATION);
       tmpError.setModuleName("BaseRecord");
@@ -246,25 +247,25 @@ public class BaseRecord
     }
 
     // Manage the different call scenarios
-    recordType = Integer.valueOf(getField(BaseDefs.BASE_DTL_RECORD_DETAIL_IDX));
+    recordType = Integer.valueOf(getField(ArtilliumDefs.BASE_DTL_RECORD_DETAIL_IDX));
 
     // perform the mapping of the service
     switch (recordType) {
-      case BaseDefs.BASE_VOICE_CALL:
-      case BaseDefs.BASE_CALLBACK:
-      case BaseDefs.BASE_CONFERENCING: {
+      case ArtilliumDefs.BASE_VOICE_CALL:
+      case ArtilliumDefs.BASE_CALLBACK:
+      case ArtilliumDefs.BASE_CONFERENCING: {
         Service = "TEL";
         break;
       }
-      case BaseDefs.BASE_SMS: {
+      case ArtilliumDefs.BASE_SMS: {
         Service = "SMS";
         break;
       }
-      case BaseDefs.BASE_MMS: {
+      case ArtilliumDefs.BASE_MMS: {
         Service = "SMS";
         break;
       }
-      case BaseDefs.BASE_DATA_SESSION: {
+      case ArtilliumDefs.BASE_DATA_SESSION: {
         Service = "DATA";
         break;
       }
@@ -277,37 +278,37 @@ public class BaseRecord
     }
 
     // Manage the different call scenarios
-    callScenario = Integer.valueOf(getField(BaseDefs.BASE_DTL_CALL_MODE_IDX));
+    callScenario = Integer.valueOf(getField(ArtilliumDefs.BASE_DTL_CALL_MODE_IDX));
 
     // Controls number inversions
     boolean invert = false;
 
     // perform the mapping of the service
     switch (callScenario) {
-      case BaseDefs.BASE_MODE_MO:
-      case BaseDefs.BASE_MODE_FWD: {
+      case ArtilliumDefs.BASE_MODE_MO:
+      case ArtilliumDefs.BASE_MODE_FWD: {
         cdrType = "MO";
         break;
       }
-      case BaseDefs.BASE_MODE_MT: {
+      case ArtilliumDefs.BASE_MODE_MT: {
         cdrType = "MT";
         break;
       }
-      case BaseDefs.BASE_MODE_ROAM_MO:
-      case BaseDefs.BASE_MODE_ROAM_FWD: {
+      case ArtilliumDefs.BASE_MODE_ROAM_MO:
+      case ArtilliumDefs.BASE_MODE_ROAM_FWD: {
         cdrType = "RO";
         break;
       }
-      case BaseDefs.BASE_MODE_ROAM_MT: {
+      case ArtilliumDefs.BASE_MODE_ROAM_MT: {
         cdrType = "RT";
         invert = true;
         break;
       }
-      case BaseDefs.BASE_MODE_POC: {
+      case ArtilliumDefs.BASE_MODE_POC: {
         cdrType = "POC";
         break;
       }
-      case BaseDefs.BASE_MODE_PTC: {
+      case ArtilliumDefs.BASE_MODE_PTC: {
         cdrType = "PTC";
         invert = true;
         break;
@@ -321,8 +322,8 @@ public class BaseRecord
     }
 
     // Deal with PTC from Ergatel - Identified by CLI blank and non mobile number in Orig point
-    if ((cdrType.equals("PTC")) && (getField(BaseDefs.BASE_DTL_ORIGINATING_CLI_IDX).isEmpty())
-            && (getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX).startsWith("32")) && (getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX).length() == 10)) {
+    if ((cdrType.equals("PTC")) && (getField(ArtilliumDefs.BASE_DTL_ORIGINATING_CLI_IDX).isEmpty())
+            && (getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX).startsWith("32")) && (getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX).length() == 10)) {
       // This is a re-routed call - discard
       tmpError = new RecordError("ERR_MOBILE_REROUTE", ErrorType.DATA_VALIDATION);
       tmpError.setModuleName("BaseRecord");
@@ -331,25 +332,25 @@ public class BaseRecord
 
     // take care of number inversions
     if (invert) {
-      if (getField(BaseDefs.BASE_DTL_ORIGINATING_CLI_IDX).isEmpty()) {
-        A_Number = getField(BaseDefs.BASE_DTL_DESTINATION_POINT_IDX);
+      if (getField(ArtilliumDefs.BASE_DTL_ORIGINATING_CLI_IDX).isEmpty()) {
+        A_Number = getField(ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX);
       } else {
-        A_Number = "00" + getField(BaseDefs.BASE_DTL_ORIGINATING_CLI_IDX);
+        A_Number = "00" + getField(ArtilliumDefs.BASE_DTL_ORIGINATING_CLI_IDX);
       }
 
-      if (getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX).startsWith("00")) {
-        B_Number = getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX);
+      if (getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX).startsWith("00")) {
+        B_Number = getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX);
       } else {
-        B_Number = "00" + getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX);
+        B_Number = "00" + getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX);
       }
-      Orig_Number = getField(BaseDefs.BASE_DTL_DESTINATION_POINT_IDX);
+      Orig_Number = getField(ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX);
 
       // Change the prefix for account lookup
       guidingKey = A_Number.replaceAll("0032", "0");
     } else {
-      A_Number = "00" + getField(BaseDefs.BASE_DTL_ORIGINATING_CLI_IDX);
-      B_Number = getField(BaseDefs.BASE_DTL_DESTINATION_POINT_IDX);
-      Orig_Number = getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX);
+      A_Number = "00" + getField(ArtilliumDefs.BASE_DTL_ORIGINATING_CLI_IDX);
+      B_Number = getField(ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX);
+      Orig_Number = getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX);
 
       if (A_Number.equals("00")) {
         A_Number = Orig_Number;
@@ -371,9 +372,9 @@ public class BaseRecord
       B_Number = "003240000000";
     }
 
-    String DurationStr = getField(BaseDefs.BASE_DTL_SESSION_DURATION_IDX);
-    String SizeStr = getField(BaseDefs.BASE_DTL_SESSION_SIZE_IDX);
-    String Start_DateTime = getField(BaseDefs.BASE_DTL_DATETIME_START_IDX);
+    String DurationStr = getField(ArtilliumDefs.BASE_DTL_SESSION_DURATION_IDX);
+    String SizeStr = getField(ArtilliumDefs.BASE_DTL_SESSION_SIZE_IDX);
+    String Start_DateTime = getField(ArtilliumDefs.BASE_DTL_DATETIME_START_IDX);
 
     // Parse the event start date
     try {
@@ -413,10 +414,10 @@ public class BaseRecord
     ChargeableRecord = true;
 
     // used as a primary key
-    linkedRecID = getField(BaseDefs.BASE_DTL_LINKED_RECORD_ID_IDX);
+    linkedRecID = getField(ArtilliumDefs.BASE_DTL_LINKED_RECORD_ID_IDX);
 
     // Get the wholesale price
-    double wholesalePrice = Double.valueOf(getField(BaseDefs.BASE_DTL_PRICE_IDX));
+    double wholesalePrice = Double.valueOf(getField(ArtilliumDefs.BASE_DTL_PRICE_IDX));
 
     // Set the RUM Values
     setRUMValue("WEUR", wholesalePrice);
@@ -436,7 +437,7 @@ public class BaseRecord
 
     StringBuilder recordData = new StringBuilder();
     recordData.append(JBUserId);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     // Use the technology indicator to suppress order loading in JBilling
     if (rerate) {
       switch (Service) {
@@ -450,8 +451,8 @@ public class BaseRecord
           recordData.append("KA"); // technology indicator - KPN Base Data Rerate
           break;
       }
-      recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
-      recordData.append(backoutInfo[BaseDefs.IDX_RR_id]); // used for linking records in re-rating case
+      recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
+      recordData.append(backoutInfo[ArtilliumDefs.IDX_RR_id]); // used for linking records in re-rating case
     } else {
       switch (Service) {
         case "SMS":
@@ -464,46 +465,46 @@ public class BaseRecord
           recordData.append("KD"); // technology indicator - KPN Base Data
           break;
       }
-      recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+      recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
       recordData.append("0");
     }
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(Category);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(InvDestination);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(BaseTariff);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(UserTariff);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(formatter.format(RatedAmount));
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(0); // OverrideRatedAmount
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append("0"); // User Override
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(UsedDiscount);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(formatter.format(DiscountGranted));
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(DiscountRule);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(DiscountRUM);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(CounterCycle);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(RecId);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
 
     // recovered BCN
     recordData.append(recoveredBCN);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
 
     // calculated A and B Numbers
     recordData.append(guidingKey);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     recordData.append(B_Number);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
     // calculated amount
     switch (this.Service) {
       case "TEL":
@@ -516,15 +517,15 @@ public class BaseRecord
         recordData.append(Volume);
         break;
     }
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
 
     // CDR Date YYYYMMDDhhmmss
     recordData.append(EventTS);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
 
     // File Reference
     recordData.append(streamReference);
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
 
     // linked record ID - primary key
     if (rerate) {
@@ -532,14 +533,14 @@ public class BaseRecord
     } else {
       recordData.append(linkedRecID);
     }
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
 
     // Balance updates
     for (int balCnt = 0; balCnt < getBalanceImpactCount(); balCnt++) {
       BalanceImpact tmpBalImp = getBalanceImpact(balCnt);
 
       if (balCnt > 0) {
-        recordData.append(BaseDefs.BASE_BALIMP_SPLITTER);
+        recordData.append(ArtilliumDefs.BASE_BALIMP_SPLITTER);
       }
       recordData.append(tmpBalImp.balanceGroup).append("|");
       recordData.append(tmpBalImp.counterID).append("|");
@@ -548,7 +549,7 @@ public class BaseRecord
       recordData.append(tmpBalImp.balanceDelta).append("|");
       recordData.append(tmpBalImp.ruleName);
     }
-    recordData.append(BaseDefs.BASE_FIELD_SPLITTER);
+    recordData.append(ArtilliumDefs.BASE_FIELD_SPLITTER);
 
     // Output original fields
     for (int idx = 0; idx < fields.length; idx++) {
@@ -593,7 +594,7 @@ public class BaseRecord
     tmpDumpList = new ArrayList<>();
 
     // Perform for detail record types
-    if (RECORD_TYPE == BaseDefs.BASE_DETAIL_TYPE) {
+    if (RECORD_TYPE == ArtilliumDefs.BASE_DETAIL_TYPE) {
       // Format the fields
       tmpDumpList.add("============ BEGIN RECORD ============");
       tmpDumpList.add("  Record Number           = <" + RecordNumber + ">");
@@ -602,51 +603,51 @@ public class BaseRecord
       tmpDumpList.add("  Recycle Count           = <" + recycleCount + ">");
       tmpDumpList.add("--------------------------------------");
 
-      tmpDumpList.add("  RECORD_ID               = <" + getField(BaseDefs.BASE_DTL_RECORD_ID_IDX) + ">");
-      tmpDumpList.add("  RECORD_TYPE             = <" + getField(BaseDefs.BASE_DTL_RECORD_TYPE_IDX) + ">");
-      tmpDumpList.add("  RECORD_DETAIL           = <" + getField(BaseDefs.BASE_DTL_RECORD_DETAIL_IDX) + ">");
-      tmpDumpList.add("  LINKED_RECORD_ID        = <" + getField(BaseDefs.BASE_DTL_LINKED_RECORD_ID_IDX) + ">");
-      tmpDumpList.add("  LAST_EXPORTED_DATETIME  = <" + getField(BaseDefs.BASE_DTL_LAST_EXPORTED_DATETIME_IDX) + ">");
-      tmpDumpList.add("  ORIGINATING_CLI         = <" + getField(BaseDefs.BASE_DTL_ORIGINATING_CLI_IDX) + ">");
-      tmpDumpList.add("  ORIGINATING_POINT       = <" + getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX) + ">");
-      tmpDumpList.add("  DESTINATION_POINT       = <" + getField(BaseDefs.BASE_DTL_DESTINATION_POINT_IDX) + ">");
-      tmpDumpList.add("  NETWORK_GROUP           = <" + getField(BaseDefs.BASE_DTL_NETWORK_GROUP_IDX) + ">");
+      tmpDumpList.add("  RECORD_ID               = <" + getField(ArtilliumDefs.BASE_DTL_RECORD_ID_IDX) + ">");
+      tmpDumpList.add("  RECORD_TYPE             = <" + getField(ArtilliumDefs.BASE_DTL_RECORD_TYPE_IDX) + ">");
+      tmpDumpList.add("  RECORD_DETAIL           = <" + getField(ArtilliumDefs.BASE_DTL_RECORD_DETAIL_IDX) + ">");
+      tmpDumpList.add("  LINKED_RECORD_ID        = <" + getField(ArtilliumDefs.BASE_DTL_LINKED_RECORD_ID_IDX) + ">");
+      tmpDumpList.add("  LAST_EXPORTED_DATETIME  = <" + getField(ArtilliumDefs.BASE_DTL_LAST_EXPORTED_DATETIME_IDX) + ">");
+      tmpDumpList.add("  ORIGINATING_CLI         = <" + getField(ArtilliumDefs.BASE_DTL_ORIGINATING_CLI_IDX) + ">");
+      tmpDumpList.add("  ORIGINATING_POINT       = <" + getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX) + ">");
+      tmpDumpList.add("  DESTINATION_POINT       = <" + getField(ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX) + ">");
+      tmpDumpList.add("  NETWORK_GROUP           = <" + getField(ArtilliumDefs.BASE_DTL_NETWORK_GROUP_IDX) + ">");
 
-      tmpDumpList.add("  NETWORK_SUBGROUP        = <" + getField(BaseDefs.BASE_DTL_NETWORK_SUBGROUP_IDX) + ">");
-      tmpDumpList.add("  LOCATION_ID             = <" + getField(BaseDefs.BASE_DTL_LOCATION_ID_IDX) + ">");
-      tmpDumpList.add("  CELL_ID                 = <" + getField(BaseDefs.BASE_DTL_CELL_ID_IDX) + ">");
-      tmpDumpList.add("  DETAIL_1                = <" + getField(BaseDefs.BASE_DTL_DETAIL_1_IDX) + ">");
-      tmpDumpList.add("  DETAIL_2                = <" + getField(BaseDefs.BASE_DTL_DETAIL_2_IDX) + ">");
-      tmpDumpList.add("  TIMEZONE                = <" + getField(BaseDefs.BASE_DTL_TIMEZONE_IDX) + ">");
-      tmpDumpList.add("  CALL_MODE               = <" + getField(BaseDefs.BASE_DTL_CALL_MODE_IDX) + ">");
-      tmpDumpList.add("  DATETIME_START          = <" + getField(BaseDefs.BASE_DTL_DATETIME_START_IDX) + ">");
-      tmpDumpList.add("  DATETIME_END            = <" + getField(BaseDefs.BASE_DTL_DATETIME_END_IDX) + ">");
-      tmpDumpList.add("  SESSION_DURATION        = <" + getField(BaseDefs.BASE_DTL_SESSION_DURATION_IDX) + ">");
-      tmpDumpList.add("  SESSION_SIZE            = <" + getField(BaseDefs.BASE_DTL_SESSION_SIZE_IDX) + ">");
-      tmpDumpList.add("  EVENTS                  = <" + getField(BaseDefs.BASE_DTL_EVENTS_IDX) + ">");
-      tmpDumpList.add("  BUNDLE_ID               = <" + getField(BaseDefs.BASE_DTL_BUNDLE_ID_IDX) + ">");
-      tmpDumpList.add("  BUNDLE_UNITS_DEFINTION  = <" + getField(BaseDefs.BASE_DTL_BUNDLE_UNITS_DEFINTION_IDX) + ">");
-      tmpDumpList.add("  BUNDLE_UNITS_USAGE      = <" + getField(BaseDefs.BASE_DTL_BUNDLE_UNITS_USAGE_IDX) + ">");
-      tmpDumpList.add("  TARIFF_ID               = <" + getField(BaseDefs.BASE_DTL_TARIFF_ID_IDX) + ">");
-      tmpDumpList.add("  PACKAGE_ID              = <" + getField(BaseDefs.BASE_DTL_PACKAGE_ID_IDX) + ">");
-      tmpDumpList.add("  REGION_ID               = <" + getField(BaseDefs.BASE_DTL_REGION_ID_IDX) + ">");
-      tmpDumpList.add("  PRICE_TYPE              = <" + getField(BaseDefs.BASE_DTL_PRICE_TYPE_IDX) + ">");
-      tmpDumpList.add("  SETUP_FEE               = <" + getField(BaseDefs.BASE_DTL_SETUP_FEE_IDX) + ">");
-      tmpDumpList.add("  PRICE                   = <" + getField(BaseDefs.BASE_DTL_PRICE_IDX) + ">");
-      tmpDumpList.add("  TAX                     = <" + getField(BaseDefs.BASE_DTL_TAX_IDX) + ">");
-      tmpDumpList.add("  END_BALANCE             = <" + getField(BaseDefs.BASE_DTL_END_BALANCE_IDX) + ">");
-      tmpDumpList.add("  EXTERNAL_REFERENCE_ID   = <" + getField(BaseDefs.BASE_DTL_EXTERNAL_REFERENCE_ID_IDX) + ">");
-      tmpDumpList.add("  PREMIUM_NUMBER          = <" + getField(BaseDefs.BASE_DTL_PREMIUM_NUMBER_IDX) + ">");
-      tmpDumpList.add("  PREMIUM_SERVICE_DESCR   = <" + getField(BaseDefs.BASE_DTL_PREMIUM_SERVICE_DESCR_IDX) + ">");
-      tmpDumpList.add("  PROVIDER_NAME           = <" + getField(BaseDefs.BASE_DTL_PROVIDER_NAME_IDX) + ">");
-      tmpDumpList.add("  CUSTOMER_CARE_CONTACT   = <" + getField(BaseDefs.BASE_DTL_CUSTOMER_CARE_CONTACT_IDX) + ">");
-      tmpDumpList.add("  CLIP_PRESENTATION_IND   = <" + getField(BaseDefs.BASE_DTL_CLIP_PRESENTATION_IND_IDX) + ">");
-      tmpDumpList.add("  EXTERNAL_ID             = <" + getField(BaseDefs.BASE_DTL_EXTERNAL_ID_IDX) + ">");
+      tmpDumpList.add("  NETWORK_SUBGROUP        = <" + getField(ArtilliumDefs.BASE_DTL_NETWORK_SUBGROUP_IDX) + ">");
+      tmpDumpList.add("  LOCATION_ID             = <" + getField(ArtilliumDefs.BASE_DTL_LOCATION_ID_IDX) + ">");
+      tmpDumpList.add("  CELL_ID                 = <" + getField(ArtilliumDefs.BASE_DTL_CELL_ID_IDX) + ">");
+      tmpDumpList.add("  DETAIL_1                = <" + getField(ArtilliumDefs.BASE_DTL_DETAIL_1_IDX) + ">");
+      tmpDumpList.add("  DETAIL_2                = <" + getField(ArtilliumDefs.BASE_DTL_DETAIL_2_IDX) + ">");
+      tmpDumpList.add("  TIMEZONE                = <" + getField(ArtilliumDefs.BASE_DTL_TIMEZONE_IDX) + ">");
+      tmpDumpList.add("  CALL_MODE               = <" + getField(ArtilliumDefs.BASE_DTL_CALL_MODE_IDX) + ">");
+      tmpDumpList.add("  DATETIME_START          = <" + getField(ArtilliumDefs.BASE_DTL_DATETIME_START_IDX) + ">");
+      tmpDumpList.add("  DATETIME_END            = <" + getField(ArtilliumDefs.BASE_DTL_DATETIME_END_IDX) + ">");
+      tmpDumpList.add("  SESSION_DURATION        = <" + getField(ArtilliumDefs.BASE_DTL_SESSION_DURATION_IDX) + ">");
+      tmpDumpList.add("  SESSION_SIZE            = <" + getField(ArtilliumDefs.BASE_DTL_SESSION_SIZE_IDX) + ">");
+      tmpDumpList.add("  EVENTS                  = <" + getField(ArtilliumDefs.BASE_DTL_EVENTS_IDX) + ">");
+      tmpDumpList.add("  BUNDLE_ID               = <" + getField(ArtilliumDefs.BASE_DTL_BUNDLE_ID_IDX) + ">");
+      tmpDumpList.add("  BUNDLE_UNITS_DEFINTION  = <" + getField(ArtilliumDefs.BASE_DTL_BUNDLE_UNITS_DEFINTION_IDX) + ">");
+      tmpDumpList.add("  BUNDLE_UNITS_USAGE      = <" + getField(ArtilliumDefs.BASE_DTL_BUNDLE_UNITS_USAGE_IDX) + ">");
+      tmpDumpList.add("  TARIFF_ID               = <" + getField(ArtilliumDefs.BASE_DTL_TARIFF_ID_IDX) + ">");
+      tmpDumpList.add("  PACKAGE_ID              = <" + getField(ArtilliumDefs.BASE_DTL_PACKAGE_ID_IDX) + ">");
+      tmpDumpList.add("  REGION_ID               = <" + getField(ArtilliumDefs.BASE_DTL_REGION_ID_IDX) + ">");
+      tmpDumpList.add("  PRICE_TYPE              = <" + getField(ArtilliumDefs.BASE_DTL_PRICE_TYPE_IDX) + ">");
+      tmpDumpList.add("  SETUP_FEE               = <" + getField(ArtilliumDefs.BASE_DTL_SETUP_FEE_IDX) + ">");
+      tmpDumpList.add("  PRICE                   = <" + getField(ArtilliumDefs.BASE_DTL_PRICE_IDX) + ">");
+      tmpDumpList.add("  TAX                     = <" + getField(ArtilliumDefs.BASE_DTL_TAX_IDX) + ">");
+      tmpDumpList.add("  END_BALANCE             = <" + getField(ArtilliumDefs.BASE_DTL_END_BALANCE_IDX) + ">");
+      tmpDumpList.add("  EXTERNAL_REFERENCE_ID   = <" + getField(ArtilliumDefs.BASE_DTL_EXTERNAL_REFERENCE_ID_IDX) + ">");
+      tmpDumpList.add("  PREMIUM_NUMBER          = <" + getField(ArtilliumDefs.BASE_DTL_PREMIUM_NUMBER_IDX) + ">");
+      tmpDumpList.add("  PREMIUM_SERVICE_DESCR   = <" + getField(ArtilliumDefs.BASE_DTL_PREMIUM_SERVICE_DESCR_IDX) + ">");
+      tmpDumpList.add("  PROVIDER_NAME           = <" + getField(ArtilliumDefs.BASE_DTL_PROVIDER_NAME_IDX) + ">");
+      tmpDumpList.add("  CUSTOMER_CARE_CONTACT   = <" + getField(ArtilliumDefs.BASE_DTL_CUSTOMER_CARE_CONTACT_IDX) + ">");
+      tmpDumpList.add("  CLIP_PRESENTATION_IND   = <" + getField(ArtilliumDefs.BASE_DTL_CLIP_PRESENTATION_IND_IDX) + ">");
+      tmpDumpList.add("  EXTERNAL_ID             = <" + getField(ArtilliumDefs.BASE_DTL_EXTERNAL_ID_IDX) + ">");
 
       // deal with the transition time - only output the fields if they are there
-      if (this.fields.length >= BaseDefs.BASE_DTL_SIM_IDX) {
-        tmpDumpList.add("  IMSI                    = <" + getField(BaseDefs.BASE_DTL_IMSI_IDX) + ">");
-        tmpDumpList.add("  SIM                     = <" + getField(BaseDefs.BASE_DTL_SIM_IDX) + ">");
+      if (this.fields.length >= ArtilliumDefs.BASE_DTL_SIM_IDX) {
+        tmpDumpList.add("  IMSI                    = <" + getField(ArtilliumDefs.BASE_DTL_IMSI_IDX) + ">");
+        tmpDumpList.add("  SIM                     = <" + getField(ArtilliumDefs.BASE_DTL_SIM_IDX) + ">");
       }
       tmpDumpList.add("--------------------------------------");
       tmpDumpList.add("  Service                 = <" + Service + ">");
@@ -694,13 +695,13 @@ public class BaseRecord
       tmpDumpList.addAll(getErrorDump(26));
 
       tmpDumpList.add("============ END RECORD ============");
-    } else if (RECORD_TYPE == BaseDefs.BASE_HEADER_TYPE) {
+    } else if (RECORD_TYPE == ArtilliumDefs.BASE_HEADER_TYPE) {
       tmpDumpList.add("============ BEGIN HEADER ============");
       tmpDumpList.add("  original record      = <" + OriginalData + ">");
-    } else if (RECORD_TYPE == BaseDefs.BASE_TRAILER_TYPE) {
+    } else if (RECORD_TYPE == ArtilliumDefs.BASE_TRAILER_TYPE) {
       tmpDumpList.add("============ BEGIN TRAILER ===========");
       tmpDumpList.add("  original record      = <" + OriginalData + ">");
-    } else if (RECORD_TYPE == BaseDefs.BASE_BACKOUT_TYPE) {
+    } else if (RECORD_TYPE == ArtilliumDefs.BASE_BACKOUT_TYPE) {
       // Format the fields
       tmpDumpList.add("============ BEGIN RECORD ============");
       tmpDumpList.add("  Record Number           = <" + RecordNumber + ">");
@@ -708,50 +709,50 @@ public class BaseRecord
       tmpDumpList.add("  Output Stream           = <" + getOutputs().toString() + ">");
       tmpDumpList.add("--------------------------------------");
 
-      tmpDumpList.add("  RECORD_ID               = <" + getField(BaseDefs.BASE_DTL_RECORD_ID_IDX) + ">");
-      tmpDumpList.add("  RECORD_TYPE             = <" + getField(BaseDefs.BASE_DTL_RECORD_TYPE_IDX) + ">");
-      tmpDumpList.add("  RECORD_DETAIL           = <" + getField(BaseDefs.BASE_DTL_RECORD_DETAIL_IDX) + ">");
-      tmpDumpList.add("  LINKED_RECORD_ID        = <" + getField(BaseDefs.BASE_DTL_LINKED_RECORD_ID_IDX) + ">");
-      tmpDumpList.add("  LAST_EXPORTED_DATETIME  = <" + getField(BaseDefs.BASE_DTL_LAST_EXPORTED_DATETIME_IDX) + ">");
-      tmpDumpList.add("  ORIGINATING_CLI         = <" + getField(BaseDefs.BASE_DTL_ORIGINATING_CLI_IDX) + ">");
-      tmpDumpList.add("  ORIGINATING_POINT       = <" + getField(BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX) + ">");
-      tmpDumpList.add("  DESTINATION_POINT       = <" + getField(BaseDefs.BASE_DTL_DESTINATION_POINT_IDX) + ">");
-      tmpDumpList.add("  NETWORK_GROUP           = <" + getField(BaseDefs.BASE_DTL_NETWORK_GROUP_IDX) + ">");
-      tmpDumpList.add("  NETWORK_SUBGROUP        = <" + getField(BaseDefs.BASE_DTL_NETWORK_SUBGROUP_IDX) + ">");
-      tmpDumpList.add("  LOCATION_ID             = <" + getField(BaseDefs.BASE_DTL_LOCATION_ID_IDX) + ">");
-      tmpDumpList.add("  CELL_ID                 = <" + getField(BaseDefs.BASE_DTL_CELL_ID_IDX) + ">");
-      tmpDumpList.add("  DETAIL_1                = <" + getField(BaseDefs.BASE_DTL_DETAIL_1_IDX) + ">");
-      tmpDumpList.add("  DETAIL_2                = <" + getField(BaseDefs.BASE_DTL_DETAIL_2_IDX) + ">");
-      tmpDumpList.add("  TIMEZONE                = <" + getField(BaseDefs.BASE_DTL_TIMEZONE_IDX) + ">");
-      tmpDumpList.add("  CALL_MODE               = <" + getField(BaseDefs.BASE_DTL_CALL_MODE_IDX) + ">");
-      tmpDumpList.add("  DATETIME_START          = <" + getField(BaseDefs.BASE_DTL_DATETIME_START_IDX) + ">");
-      tmpDumpList.add("  DATETIME_END            = <" + getField(BaseDefs.BASE_DTL_DATETIME_END_IDX) + ">");
-      tmpDumpList.add("  SESSION_DURATION        = <" + getField(BaseDefs.BASE_DTL_SESSION_DURATION_IDX) + ">");
-      tmpDumpList.add("  SESSION_SIZE            = <" + getField(BaseDefs.BASE_DTL_SESSION_SIZE_IDX) + ">");
-      tmpDumpList.add("  EVENTS                  = <" + getField(BaseDefs.BASE_DTL_EVENTS_IDX) + ">");
-      tmpDumpList.add("  BUNDLE_ID               = <" + getField(BaseDefs.BASE_DTL_BUNDLE_ID_IDX) + ">");
-      tmpDumpList.add("  BUNDLE_UNITS_DEFINTION  = <" + getField(BaseDefs.BASE_DTL_BUNDLE_UNITS_DEFINTION_IDX) + ">");
-      tmpDumpList.add("  BUNDLE_UNITS_USAGE      = <" + getField(BaseDefs.BASE_DTL_BUNDLE_UNITS_USAGE_IDX) + ">");
-      tmpDumpList.add("  TARIFF_ID               = <" + getField(BaseDefs.BASE_DTL_TARIFF_ID_IDX) + ">");
-      tmpDumpList.add("  PACKAGE_ID              = <" + getField(BaseDefs.BASE_DTL_PACKAGE_ID_IDX) + ">");
-      tmpDumpList.add("  REGION_ID               = <" + getField(BaseDefs.BASE_DTL_REGION_ID_IDX) + ">");
-      tmpDumpList.add("  PRICE_TYPE              = <" + getField(BaseDefs.BASE_DTL_PRICE_TYPE_IDX) + ">");
-      tmpDumpList.add("  SETUP_FEE               = <" + getField(BaseDefs.BASE_DTL_SETUP_FEE_IDX) + ">");
-      tmpDumpList.add("  PRICE                   = <" + getField(BaseDefs.BASE_DTL_PRICE_IDX) + ">");
-      tmpDumpList.add("  TAX                     = <" + getField(BaseDefs.BASE_DTL_TAX_IDX) + ">");
-      tmpDumpList.add("  END_BALANCE             = <" + getField(BaseDefs.BASE_DTL_END_BALANCE_IDX) + ">");
-      tmpDumpList.add("  EXTERNAL_REFERENCE_ID   = <" + getField(BaseDefs.BASE_DTL_EXTERNAL_REFERENCE_ID_IDX) + ">");
-      tmpDumpList.add("  PREMIUM_NUMBER          = <" + getField(BaseDefs.BASE_DTL_PREMIUM_NUMBER_IDX) + ">");
-      tmpDumpList.add("  PREMIUM_SERVICE_DESCR   = <" + getField(BaseDefs.BASE_DTL_PREMIUM_SERVICE_DESCR_IDX) + ">");
-      tmpDumpList.add("  PROVIDER_NAME           = <" + getField(BaseDefs.BASE_DTL_PROVIDER_NAME_IDX) + ">");
-      tmpDumpList.add("  CUSTOMER_CARE_CONTACT   = <" + getField(BaseDefs.BASE_DTL_CUSTOMER_CARE_CONTACT_IDX) + ">");
-      tmpDumpList.add("  CLIP_PRESENTATION_IND   = <" + getField(BaseDefs.BASE_DTL_CLIP_PRESENTATION_IND_IDX) + ">");
-      tmpDumpList.add("  EXTERNAL_ID             = <" + getField(BaseDefs.BASE_DTL_EXTERNAL_ID_IDX) + ">");
+      tmpDumpList.add("  RECORD_ID               = <" + getField(ArtilliumDefs.BASE_DTL_RECORD_ID_IDX) + ">");
+      tmpDumpList.add("  RECORD_TYPE             = <" + getField(ArtilliumDefs.BASE_DTL_RECORD_TYPE_IDX) + ">");
+      tmpDumpList.add("  RECORD_DETAIL           = <" + getField(ArtilliumDefs.BASE_DTL_RECORD_DETAIL_IDX) + ">");
+      tmpDumpList.add("  LINKED_RECORD_ID        = <" + getField(ArtilliumDefs.BASE_DTL_LINKED_RECORD_ID_IDX) + ">");
+      tmpDumpList.add("  LAST_EXPORTED_DATETIME  = <" + getField(ArtilliumDefs.BASE_DTL_LAST_EXPORTED_DATETIME_IDX) + ">");
+      tmpDumpList.add("  ORIGINATING_CLI         = <" + getField(ArtilliumDefs.BASE_DTL_ORIGINATING_CLI_IDX) + ">");
+      tmpDumpList.add("  ORIGINATING_POINT       = <" + getField(ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX) + ">");
+      tmpDumpList.add("  DESTINATION_POINT       = <" + getField(ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX) + ">");
+      tmpDumpList.add("  NETWORK_GROUP           = <" + getField(ArtilliumDefs.BASE_DTL_NETWORK_GROUP_IDX) + ">");
+      tmpDumpList.add("  NETWORK_SUBGROUP        = <" + getField(ArtilliumDefs.BASE_DTL_NETWORK_SUBGROUP_IDX) + ">");
+      tmpDumpList.add("  LOCATION_ID             = <" + getField(ArtilliumDefs.BASE_DTL_LOCATION_ID_IDX) + ">");
+      tmpDumpList.add("  CELL_ID                 = <" + getField(ArtilliumDefs.BASE_DTL_CELL_ID_IDX) + ">");
+      tmpDumpList.add("  DETAIL_1                = <" + getField(ArtilliumDefs.BASE_DTL_DETAIL_1_IDX) + ">");
+      tmpDumpList.add("  DETAIL_2                = <" + getField(ArtilliumDefs.BASE_DTL_DETAIL_2_IDX) + ">");
+      tmpDumpList.add("  TIMEZONE                = <" + getField(ArtilliumDefs.BASE_DTL_TIMEZONE_IDX) + ">");
+      tmpDumpList.add("  CALL_MODE               = <" + getField(ArtilliumDefs.BASE_DTL_CALL_MODE_IDX) + ">");
+      tmpDumpList.add("  DATETIME_START          = <" + getField(ArtilliumDefs.BASE_DTL_DATETIME_START_IDX) + ">");
+      tmpDumpList.add("  DATETIME_END            = <" + getField(ArtilliumDefs.BASE_DTL_DATETIME_END_IDX) + ">");
+      tmpDumpList.add("  SESSION_DURATION        = <" + getField(ArtilliumDefs.BASE_DTL_SESSION_DURATION_IDX) + ">");
+      tmpDumpList.add("  SESSION_SIZE            = <" + getField(ArtilliumDefs.BASE_DTL_SESSION_SIZE_IDX) + ">");
+      tmpDumpList.add("  EVENTS                  = <" + getField(ArtilliumDefs.BASE_DTL_EVENTS_IDX) + ">");
+      tmpDumpList.add("  BUNDLE_ID               = <" + getField(ArtilliumDefs.BASE_DTL_BUNDLE_ID_IDX) + ">");
+      tmpDumpList.add("  BUNDLE_UNITS_DEFINTION  = <" + getField(ArtilliumDefs.BASE_DTL_BUNDLE_UNITS_DEFINTION_IDX) + ">");
+      tmpDumpList.add("  BUNDLE_UNITS_USAGE      = <" + getField(ArtilliumDefs.BASE_DTL_BUNDLE_UNITS_USAGE_IDX) + ">");
+      tmpDumpList.add("  TARIFF_ID               = <" + getField(ArtilliumDefs.BASE_DTL_TARIFF_ID_IDX) + ">");
+      tmpDumpList.add("  PACKAGE_ID              = <" + getField(ArtilliumDefs.BASE_DTL_PACKAGE_ID_IDX) + ">");
+      tmpDumpList.add("  REGION_ID               = <" + getField(ArtilliumDefs.BASE_DTL_REGION_ID_IDX) + ">");
+      tmpDumpList.add("  PRICE_TYPE              = <" + getField(ArtilliumDefs.BASE_DTL_PRICE_TYPE_IDX) + ">");
+      tmpDumpList.add("  SETUP_FEE               = <" + getField(ArtilliumDefs.BASE_DTL_SETUP_FEE_IDX) + ">");
+      tmpDumpList.add("  PRICE                   = <" + getField(ArtilliumDefs.BASE_DTL_PRICE_IDX) + ">");
+      tmpDumpList.add("  TAX                     = <" + getField(ArtilliumDefs.BASE_DTL_TAX_IDX) + ">");
+      tmpDumpList.add("  END_BALANCE             = <" + getField(ArtilliumDefs.BASE_DTL_END_BALANCE_IDX) + ">");
+      tmpDumpList.add("  EXTERNAL_REFERENCE_ID   = <" + getField(ArtilliumDefs.BASE_DTL_EXTERNAL_REFERENCE_ID_IDX) + ">");
+      tmpDumpList.add("  PREMIUM_NUMBER          = <" + getField(ArtilliumDefs.BASE_DTL_PREMIUM_NUMBER_IDX) + ">");
+      tmpDumpList.add("  PREMIUM_SERVICE_DESCR   = <" + getField(ArtilliumDefs.BASE_DTL_PREMIUM_SERVICE_DESCR_IDX) + ">");
+      tmpDumpList.add("  PROVIDER_NAME           = <" + getField(ArtilliumDefs.BASE_DTL_PROVIDER_NAME_IDX) + ">");
+      tmpDumpList.add("  CUSTOMER_CARE_CONTACT   = <" + getField(ArtilliumDefs.BASE_DTL_CUSTOMER_CARE_CONTACT_IDX) + ">");
+      tmpDumpList.add("  CLIP_PRESENTATION_IND   = <" + getField(ArtilliumDefs.BASE_DTL_CLIP_PRESENTATION_IND_IDX) + ">");
+      tmpDumpList.add("  EXTERNAL_ID             = <" + getField(ArtilliumDefs.BASE_DTL_EXTERNAL_ID_IDX) + ">");
 
       // deal with the transition time - only output the fields if they are there
-      if (this.fields.length >= BaseDefs.BASE_DTL_SIM_IDX) {
-        tmpDumpList.add("  IMSI                    = <" + getField(BaseDefs.BASE_DTL_IMSI_IDX) + ">");
-        tmpDumpList.add("  SIM                     = <" + getField(BaseDefs.BASE_DTL_SIM_IDX) + ">");
+      if (this.fields.length >= ArtilliumDefs.BASE_DTL_SIM_IDX) {
+        tmpDumpList.add("  IMSI                    = <" + getField(ArtilliumDefs.BASE_DTL_IMSI_IDX) + ">");
+        tmpDumpList.add("  SIM                     = <" + getField(ArtilliumDefs.BASE_DTL_SIM_IDX) + ">");
       }
       tmpDumpList.add("--------------------------------------");
       tmpDumpList.add("  Service                 = <" + Service + ">");

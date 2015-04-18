@@ -1,9 +1,11 @@
-package fuzer.base;
+package artillium;
 
+import artillium.ArtilliumDefs;
 import OpenRate.process.AbstractPersistentObjectProcess;
 import OpenRate.record.ErrorType;
 import OpenRate.record.IRecord;
 import OpenRate.record.RecordError;
+import artillium.ArtilliumRecord;
 
 /**
  * This module gets one leg of a two leg call, correlating the A and B numbers
@@ -53,9 +55,9 @@ public class LegCompressor extends AbstractPersistentObjectProcess {
 
   @Override
   public IRecord procValidRecord(IRecord r) {
-    BaseRecord CurrentRecord = (BaseRecord) r;
+    ArtilliumRecord CurrentRecord = (ArtilliumRecord) r;
 
-    if ((CurrentRecord.RECORD_TYPE == BaseDefs.BASE_DETAIL_TYPE) && CurrentRecord.roamingMode) {
+    if ((CurrentRecord.RECORD_TYPE == ArtilliumDefs.BASE_DETAIL_TYPE) && CurrentRecord.roamingMode) {
       // do nothing for invalid, errored, not chargeable records
       if ((CurrentRecord.Service.equals("SMS")) || (CurrentRecord.Service.equals("TEL")) || (CurrentRecord.Service.equals("DATA"))) {
         if (getObject(CurrentRecord.linkedRecID) == null) {
@@ -71,7 +73,7 @@ public class LegCompressor extends AbstractPersistentObjectProcess {
             tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roamingMode + "," + CurrentRecord.linkedRecID);
             CurrentRecord.addError(tmpError);
           } else if (CurrentRecord.B_Number.equals("0032")) {
-            putObject(CurrentRecord.linkedRecID, "O:" + CurrentRecord.Orig_Number + ";P:" + CurrentRecord.fields[BaseDefs.BASE_DTL_PRICE_IDX]);
+            putObject(CurrentRecord.linkedRecID, "O:" + CurrentRecord.Orig_Number + ";P:" + CurrentRecord.fields[ArtilliumDefs.BASE_DTL_PRICE_IDX]);
 
             // Drop the call, we stored the info
             RecordError tmpError = new RecordError("ERR_DROPPED_LEG", ErrorType.SPECIAL);
@@ -98,8 +100,8 @@ public class LegCompressor extends AbstractPersistentObjectProcess {
               CurrentRecord.Orig_Number = tmpOtherOrigNumber;
 
               // Save the compressed information back to the input record for re-rating
-              CurrentRecord.fields[BaseDefs.BASE_DTL_ORIGINATING_POINT_IDX] = CurrentRecord.Orig_Number;
-              CurrentRecord.fields[BaseDefs.BASE_DTL_PRICE_IDX] = tmpPrice;
+              CurrentRecord.fields[ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX] = CurrentRecord.Orig_Number;
+              CurrentRecord.fields[ArtilliumDefs.BASE_DTL_PRICE_IDX] = tmpPrice;
             } else {
               RecordError tmpError = new RecordError("ERR_LEG_REPLACEMENT_O", ErrorType.SPECIAL);
               tmpError.setModuleName(getSymbolicName());
@@ -111,7 +113,7 @@ public class LegCompressor extends AbstractPersistentObjectProcess {
               CurrentRecord.B_Number = otherNumber.replaceAll("^D:", "");
 
               // Save the compressed information back to the input record for re-rating
-              CurrentRecord.fields[BaseDefs.BASE_DTL_DESTINATION_POINT_IDX] = CurrentRecord.B_Number;
+              CurrentRecord.fields[ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX] = CurrentRecord.B_Number;
             } else {
               RecordError tmpError = new RecordError("ERR_LEG_REPLACEMENT_D", ErrorType.SPECIAL);
               tmpError.setModuleName(getSymbolicName());

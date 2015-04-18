@@ -1,5 +1,6 @@
 package fuzer.base;
 
+import artillium.ArtilliumDefs;
 import OpenRate.adapter.file.FlatFileInputAdapter;
 import OpenRate.record.FlatRecord;
 import OpenRate.record.HeaderRecord;
@@ -78,11 +79,11 @@ public class BaseInput
     tmpData = originalRecord.getData();
     tmpDataRecord = new BaseRecord();
 
-    if (tmpData.startsWith(BaseDefs.BASE_HEADER))
+    if (tmpData.startsWith(ArtilliumDefs.BASE_HEADER))
     {
       tmpDataRecord.mapBaseHeaderRecord(tmpData);
     }
-    else if (tmpData.startsWith(BaseDefs.BASE_TRAILER))
+    else if (tmpData.startsWith(ArtilliumDefs.BASE_TRAILER))
     {
       tmpDataRecord.mapBaseTrailerRecord(tmpData);
     }

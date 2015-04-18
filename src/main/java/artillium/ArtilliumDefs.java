@@ -1,11 +1,11 @@
-package fuzer.base;
+package artillium;
 
 /**
  * Definitions for the Base record type.
  * 
  * @author TGDSPIA1
  */
-public class BaseDefs 
+public class ArtilliumDefs 
 {
   // Field Splitter in the input records
 	public static final String BASE_FIELD_SPLITTER = "\\|";
@@ -66,14 +66,13 @@ public class BaseDefs
 	public static final int BASE_DTL_SIM_IDX                      = 40;
 	public static final int BASE_ACCESS_TYPE_ID_IDX               = 41;
   
-
   //These are the mappings to trailer fields we are going to be using
 	public static final int BASE_TLR_RECORD_TYPE_IDX              = 0;
 	public static final int BASE_TLR_NUMBER_OF_RECORDS_IDX        = 1;
 	public static final int BASE_TLR_TRAILER_INFO_IDX             = 2;
 	public static final int BASE_TLR_TOTAL_PRICE_IDX              = 3;
   
-  // Indexes for input columns
+  // Indexes for input columns on re-rating records
   public final static int IDX_RR_id                             =  0;
   public final static int IDX_RR_userId                         =  1;
   public final static int IDX_RR_orderId                        =  2;
