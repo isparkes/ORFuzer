@@ -118,6 +118,45 @@ public class Normalisation extends AbstractRegexMatch {
       }
       currentRecord.dialedNumberNorm = tmpNumber;
       getPipeLog().debug("--- end normalize <" + tmpNumber + ">");
+      
+      
+      tmpNumber = currentRecord.originalPoint;
+
+      getPipeLog().debug("--- start normalize <" + tmpNumber + ">");
+
+      // allow several phases of normalization
+      for (i = 1; i <= 2; i++) {
+
+        tmpSearchParameters[0] = tmpNumber;
+        Results = getRegexMatchWithChildData(Integer.toString(i), tmpSearchParameters);
+        getPipeLog().debug("  iteration " + i + " <" + tmpNumber + ">");
+
+        if ((Results != null)) {
+          if (!Results.get(0).equalsIgnoreCase("nomatch")) {
+            if ((Results.size() > 1)) {
+              if (Results.get(0).isEmpty()) {
+                // just add the prefix
+                tmpNumber = Results.get(1) + tmpNumber;
+                getPipeLog().debug("  -> add prefix <" + Results.get(1) + "> = <" + tmpNumber + ">");
+              } else {
+                // remove an old prefix and add the new prefix
+                tmpNumber = tmpNumber.replaceAll(Results.get(0), Results.get(1));
+                getPipeLog().debug("  -> remove <" + Results.get(0) + "> and add prefix <" + Results.get(1) + "> = <" + tmpNumber + ">");
+              }
+            } else {
+              getPipeLog().debug("  -> error: result size < 2 result(0)=" + Results.get(0));
+              currentRecord.addError(new RecordError("ERR_NORMALISATION_LOOKUP", ErrorType.SPECIAL));
+            }
+          } else {
+            getPipeLog().debug("  -> no match");
+          }
+        } else {
+          getPipeLog().debug("  -> error: result=null");
+          currentRecord.addError(new RecordError("ERR_NORMALISATION_LOOKUP", ErrorType.SPECIAL));
+        }
+      }
+      currentRecord.dialingNumberNorm = tmpNumber;
+      getPipeLog().error("--- end normalize <" + tmpNumber + ">");
     }
     return r;
   }

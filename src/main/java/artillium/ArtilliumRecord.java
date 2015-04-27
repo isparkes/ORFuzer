@@ -18,19 +18,23 @@ public class ArtilliumRecord extends EscauxRecord {
 	private static final long serialVersionUID = 1L;
 
 	public static final int RECORD_DETAIL = 2;
+	public static final int LINKED_RECORD_ID = 3;
 	public static final int ORIGINATING_CLI = 5;
+	public static final int ORIGINATING_POINT = 6;
 	public static final int DESTINATION_POINT = 7;
 	public static final int DESTINATION_NETWORK_GROUP = 8;
 	public static final int DESTINATION_NETWORK_SUBGROUP = 9;
-	public static final int LINKED_RECORD_ID = 9;
 	public static final int CALL_MODE = 15;
 	public static final int DATETIME_START = 16;
 	public static final int SESSION_DURATION = 18;
 	public static final int SESSION_SIZE = 19;
 	public static final int EVENTS = 20;
 	public static final int PRICE_TYPE = 27;
-	//public static final int PRICE = 35;
+	public static final int SETUP_FEE = 28;
+	public static final int PRICE = 29;
 	//public static final int IMSI = 45;
+
+	public int callScenario;
 
 
 	@Override
@@ -51,6 +55,9 @@ public class ArtilliumRecord extends EscauxRecord {
 			this.billsec = Integer.parseInt(getField(SESSION_DURATION));
 			this.events = Integer.parseInt(getField(EVENTS));
 			this.size = Integer.parseInt(getField(SESSION_SIZE));
+			this.linkedRecord = getField(LINKED_RECORD_ID);
+			this.originalPoint = getField(ORIGINATING_POINT);
+			this.priceRetail = Double.parseDouble(getField(PRICE));
 			//this.callType = getField(CALL_TYPE_IDX);
 
 			// Get the event date 2014 06 03 103804
@@ -69,6 +76,7 @@ public class ArtilliumRecord extends EscauxRecord {
 			this.setRUMValue("DUR", this.billsec);
 			this.setRUMValue("EVT", this.events);
 			this.setRUMValue("SIZE", this.size);
+			this.setRUMValue("RETAIL", this.priceRetail);
 
 			// Add a charge packet
 			ChargePacket tmpCP = new ChargePacket();

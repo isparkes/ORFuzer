@@ -1,11 +1,10 @@
-package artillium;
+package escaux;
 
 import artillium.ArtilliumDefs;
 import OpenRate.process.AbstractPersistentObjectProcess;
 import OpenRate.record.ErrorType;
 import OpenRate.record.IRecord;
 import OpenRate.record.RecordError;
-import artillium.ArtilliumRecord;
 
 /**
  * This module gets one leg of a two leg call, correlating the A and B numbers
@@ -55,69 +54,69 @@ public class LegCompressor extends AbstractPersistentObjectProcess {
 
   @Override
   public IRecord procValidRecord(IRecord r) {
-    ArtilliumRecord CurrentRecord = (ArtilliumRecord) r;
+    EscauxRecord CurrentRecord = (EscauxRecord) r;
+    
+    getPipeLog().error("Entering LegCompressor");
 
-    if ((CurrentRecord.RECORD_TYPE == ArtilliumDefs.BASE_DETAIL_TYPE) && CurrentRecord.roamingMode) {
+    if ((CurrentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) && "YES".equals(CurrentRecord.roaming)) {
       // do nothing for invalid, errored, not chargeable records
-      if ((CurrentRecord.Service.equals("SMS")) || (CurrentRecord.Service.equals("TEL")) || (CurrentRecord.Service.equals("DATA"))) {
-        if (getObject(CurrentRecord.linkedRecID) == null) {
+      if ((CurrentRecord.service.equals("SMS")) || (CurrentRecord.service.equals("VOICE")) || (CurrentRecord.service.equals("DATA"))) {
+        if (getObject(CurrentRecord.linkedRecord) == null) {
           // We do not have a matching twin for this record, we have to assume that it is the first
           // We have to work out which is the number to keep. We know that it
           // will not be 0032 (Belgium), so we take the *other* number.
-          if (CurrentRecord.Orig_Number.equals("0032")) {
-            putObject(CurrentRecord.linkedRecID, "D:" + CurrentRecord.B_Number);
-
+          if (CurrentRecord.originalPoint.equals("0032")) {
+            putObject(CurrentRecord.linkedRecord, "D:" + CurrentRecord.dialedNumber);
             // Drop the call, we stored the info
             RecordError tmpError = new RecordError("ERR_DROPPED_LEG", ErrorType.SPECIAL);
             tmpError.setModuleName(getSymbolicName());
-            tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roamingMode + "," + CurrentRecord.linkedRecID);
+            tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roaming + "," + CurrentRecord.linkedRecord);
             CurrentRecord.addError(tmpError);
-          } else if (CurrentRecord.B_Number.equals("0032")) {
-            putObject(CurrentRecord.linkedRecID, "O:" + CurrentRecord.Orig_Number + ";P:" + CurrentRecord.fields[ArtilliumDefs.BASE_DTL_PRICE_IDX]);
+          } else if (CurrentRecord.dialedNumber.equals("0032")) {
+            putObject(CurrentRecord.linkedRecord, "O:" + CurrentRecord.originalPoint + ";P:" + CurrentRecord.fields[ArtilliumDefs.BASE_DTL_PRICE_IDX]);
 
             // Drop the call, we stored the info
             RecordError tmpError = new RecordError("ERR_DROPPED_LEG", ErrorType.SPECIAL);
             tmpError.setModuleName(getSymbolicName());
-            tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roamingMode + "," + CurrentRecord.linkedRecID);
+            tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roaming + "," + CurrentRecord.linkedRecord);
             CurrentRecord.addError(tmpError);
           }
         } else {
           // We have already stored the matching twin, so take it back out of the 
           // store, and enrich the record.
-          String otherNumber = (String) getObject(CurrentRecord.linkedRecID);
-
+          String otherNumber = (String) getObject(CurrentRecord.linkedRecord);
           // Remove the entry from the cache
-          deleteObject(CurrentRecord.linkedRecID);
+          deleteObject(CurrentRecord.linkedRecord);
 
           // Enrich this record with the inforamtion we stored away from the
           // first twin.
-          if (CurrentRecord.Orig_Number.equals("0032")) {
+          if (CurrentRecord.originalPoint.equals("0032")) {
             if (otherNumber.startsWith("O:")) {
               // Split the price and number information
               String[] otherNumberParts = otherNumber.split(";");
               String tmpOtherOrigNumber = otherNumberParts[0].replaceAll("^O:", "");
               String tmpPrice = otherNumberParts[1].replaceAll("^P:", "");
-              CurrentRecord.Orig_Number = tmpOtherOrigNumber;
+              CurrentRecord.originalPoint = tmpOtherOrigNumber;
 
               // Save the compressed information back to the input record for re-rating
-              CurrentRecord.fields[ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX] = CurrentRecord.Orig_Number;
+              CurrentRecord.fields[ArtilliumDefs.BASE_DTL_ORIGINATING_POINT_IDX] = CurrentRecord.originalPoint;
               CurrentRecord.fields[ArtilliumDefs.BASE_DTL_PRICE_IDX] = tmpPrice;
             } else {
               RecordError tmpError = new RecordError("ERR_LEG_REPLACEMENT_O", ErrorType.SPECIAL);
               tmpError.setModuleName(getSymbolicName());
-              tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roamingMode + "," + CurrentRecord.linkedRecID);
+              tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roaming + "," + CurrentRecord.linkedRecord);
               CurrentRecord.addError(tmpError);
             }
           } else {
             if (otherNumber.startsWith("D:")) {
-              CurrentRecord.B_Number = otherNumber.replaceAll("^D:", "");
+              CurrentRecord.dialedNumber = otherNumber.replaceAll("^D:", "");
 
               // Save the compressed information back to the input record for re-rating
-              CurrentRecord.fields[ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX] = CurrentRecord.B_Number;
+              CurrentRecord.fields[ArtilliumDefs.BASE_DTL_DESTINATION_POINT_IDX] = CurrentRecord.dialedNumber;
             } else {
               RecordError tmpError = new RecordError("ERR_LEG_REPLACEMENT_D", ErrorType.SPECIAL);
               tmpError.setModuleName(getSymbolicName());
-              tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roamingMode + "," + CurrentRecord.linkedRecID);
+              tmpError.setErrorDescription(CurrentRecord.Service + "," + CurrentRecord.roaming + "," + CurrentRecord.linkedRecord);
               CurrentRecord.addError(tmpError);
             }
           }

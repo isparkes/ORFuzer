@@ -67,30 +67,33 @@ import OpenRate.record.TimePacket;
 public class PriceLookup extends AbstractRegexMatch {
 
   // Regex search parameters - defined here for performance reasons
-  private final String[] tmpSearchParameters = new String[2];
+  private final String[] tmpSearchParameters = new String[4];
 
   @Override
   public IRecord procValidRecord(IRecord r) {
-    EscauxRecord CurrentRecord = (EscauxRecord) r;
+    EscauxRecord currentRecord = (EscauxRecord) r;
 
     // We only transform the detail records, and leave the others alone
-    if (CurrentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
-        tmpSearchParameters[0] = CurrentRecord.destination;
-        tmpSearchParameters[1] = CurrentRecord.service;
+    if (currentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
+        tmpSearchParameters[0] = currentRecord.direction;
+        tmpSearchParameters[1] = currentRecord.type;
+        tmpSearchParameters[2] = currentRecord.fromZone;
+        tmpSearchParameters[3] = currentRecord.toZone;
         
         // Find the price group and place them into the charge packets
-        for (ChargePacket tmpCP : CurrentRecord.getChargePackets()) {
+        for (ChargePacket tmpCP : currentRecord.getChargePackets()) {
           if (tmpCP.Valid) {
             for (TimePacket tmpTZ : tmpCP.getTimeZones()) {
-              String tmpPriceGroup = getRegexMatch(tmpCP.ratePlanName, tmpSearchParameters);
+              String tmpPriceGroup = getRegexMatch(currentRecord.service, tmpSearchParameters);
 
               if (isValidRegexMatchResult(tmpPriceGroup)) {
                 tmpTZ.priceGroup = tmpPriceGroup;
+                currentRecord.priceType = tmpPriceGroup;
               } else {
                 // if this is a base product, error, otherwise turn the CP off
                 if (tmpCP.priority == 0) {
                   // base product
-                  CurrentRecord.addError(new RecordError("ERR_BASE_PROD_PRICE_MAP", ErrorType.DATA_NOT_FOUND));
+                  currentRecord.addError(new RecordError("ERR_BASE_PROD_PRICE_MAP", ErrorType.DATA_NOT_FOUND));
                 } else {
                   // overlay product
                   tmpCP.Valid = false;

@@ -82,6 +82,21 @@
         <DataCache>RoamingLookupCache</DataCache>
         <BatchSize>5000</BatchSize>
       </RoamingLookup>
+      
+      <LegCompressor>
+       <ClassName>escaux.LegCompressor</ClassName>
+       <Active>true</Active>
+       <BatchSize>5000</BatchSize>
+       <DataCache>LegCache</DataCache>
+     </LegCompressor>
+     
+     <PremiumFilter>
+     	<ClassName>escaux.EscauxFilter</ClassName>
+     	<Active>true</Active>
+       	<BatchSize>5000</BatchSize>
+       	<Values>0,1,2</Values>
+       	<Field>27</Field>
+     </PremiumFilter>  
 	      
       <AccountLookup>
         <ClassName>escaux.AccountLookup</ClassName>
@@ -89,6 +104,13 @@
         <DataCache>AccountCache</DataCache>
         <BatchSize>5000</BatchSize>
       </AccountLookup>
+      
+      <FleetLookup>
+        <ClassName>escaux.FleetLookup</ClassName>
+        <Active>True</Active>
+        <DataCache>AccountCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </FleetLookup>
 
       <DestLookup>
         <ClassName>escaux.DestLookup</ClassName>
@@ -96,6 +118,13 @@
         <DataCache>PrefixCache</DataCache>
         <BatchSize>5000</BatchSize>
       </DestLookup>
+      
+      <ZoneLookup>
+      	<ClassName>escaux.ZonesLookup</ClassName>
+      	<Active>True</Active>
+        <DataCache>ZoneLookupCache</DataCache>
+        <BatchSize>5000</BatchSize>
+      </ZoneLookup>
 
       <PriceLookup>
         <ClassName>escaux.PriceLookup</ClassName>
@@ -219,7 +248,7 @@
           <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
           <DataSourceType>File</DataSourceType>
           <DataFile>ConfigData/prices.dat</DataFile>
-          <KeyFields>2</KeyFields>
+          <KeyFields>4</KeyFields>
         </PriceLookupCache>
 
         <DiscountLookupCache>
@@ -244,6 +273,7 @@
           <KeyFields>1</KeyFields>
           <Keys>2</Keys>
           <Fields>service</Fields>
+          <ErrorMessage>Service cannot be defined</ErrorMessage>
         </ServiceLookupCache>
         
 		<TypeLookupCache>
@@ -253,6 +283,7 @@
           <KeyFields>1</KeyFields>
           <Keys>8</Keys>
           <Fields>type</Fields>
+          <ErrorMessage>Type cannot be defined</ErrorMessage>
         </TypeLookupCache>
         
         <RoamingLookupCache>
@@ -262,8 +293,22 @@
           <KeyFields>1</KeyFields>
           <Keys>15</Keys>
           <Fields>roaming,direction</Fields>
+          <ErrorMessage>Roaming cannot be defined</ErrorMessage>
         </RoamingLookupCache>
-	
+        
+        <ZoneLookupCache>
+          <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/zones.dat</DataFile>
+          <KeyFields>1</KeyFields>
+        </ZoneLookupCache>
+        
+        <LegCache>
+          <ClassName>OpenRate.cache.PersistentIndexedObject</ClassName>
+          <DataSourceType>File</DataSourceType>
+          <DataFile>ConfigData/legs.dat</DataFile>
+        </LegCache>
+    
       </CacheableClass>
     </CacheFactory>
   </Resource>

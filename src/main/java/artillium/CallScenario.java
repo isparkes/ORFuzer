@@ -29,10 +29,10 @@ public class CallScenario extends AbstractStubPlugIn {
       switch (CurrentRecord.Service) {
         case "SMS":
           if (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_MO) {
-            CurrentRecord.roamingMode = false;
+            CurrentRecord.roaming = "NO";
             CurrentRecord.direction = "Originating";
           } else if (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_PTC) {
-            CurrentRecord.roamingMode = false;
+            CurrentRecord.roaming = "NO";
             CurrentRecord.direction = "Originating";
 
             // No rating for domestic terminating SMS
@@ -40,17 +40,17 @@ public class CallScenario extends AbstractStubPlugIn {
             CurrentRecord.addError(tmpError);
           } else if ((CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_POC)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_MT)) {
-            CurrentRecord.roamingMode = false;
+            CurrentRecord.roaming = "NO";
             CurrentRecord.direction = "Terminating";
 
             // No rating for domestic terminating SMS
             RecordError tmpError = new RecordError("ERR_NON_BILLABLE_RECORD", ErrorType.SPECIAL, getSymbolicName());
             CurrentRecord.addError(tmpError);
           } else if (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_MO) {
-            CurrentRecord.roamingMode = true;
+            CurrentRecord.roaming = "YES";
             CurrentRecord.direction = "Originating";
           } else if (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_MT) {
-            CurrentRecord.roamingMode = true;
+            CurrentRecord.roaming = "YES";
             CurrentRecord.direction = "Terminating";
           } else {
             RecordError tmpError = new RecordError("ERR_SCENARIO_NOT_MAPPED:"
@@ -64,7 +64,7 @@ public class CallScenario extends AbstractStubPlugIn {
           if ((CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_PTC)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_MO)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_FWD)) {
-            CurrentRecord.roamingMode = false;
+            CurrentRecord.roaming = "NO";
             CurrentRecord.direction = "Originating";
 
             // No rating for domestic originating Telephony (covered by Broadsoft)
@@ -72,18 +72,18 @@ public class CallScenario extends AbstractStubPlugIn {
             CurrentRecord.addError(tmpError);
           } else if ((CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_POC)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_MT)) {
-            CurrentRecord.roamingMode = false;
+            CurrentRecord.roaming = "NO";
             CurrentRecord.direction = "Terminating";
 
             // No rating for domestic terminating Telephony (covered by Broadsoft)
             RecordError tmpError = new RecordError("ERR_NON_BILLABLE_RECORD", ErrorType.SPECIAL, getSymbolicName());
             CurrentRecord.addError(tmpError);
           } else if (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_MT) {
-            CurrentRecord.roamingMode = true;
+            CurrentRecord.roaming = "YES";
             CurrentRecord.direction = "Terminating";
           } else if ((CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_MO)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_FWD)) {
-            CurrentRecord.roamingMode = true;
+            CurrentRecord.roaming = "YES";
             CurrentRecord.direction = "Originating";
           } else {
             RecordError tmpError = new RecordError("ERR_SCENARIO_NOT_MAPPED:"
@@ -96,18 +96,18 @@ public class CallScenario extends AbstractStubPlugIn {
         case "DATA":
           if ((CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_PTC)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_MO)) {
-            CurrentRecord.roamingMode = false;
+            CurrentRecord.roaming = "NO";
             CurrentRecord.direction = "Originating";
           } else if ((CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_POC)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_MT)) {
-            CurrentRecord.roamingMode = false;
+            CurrentRecord.roaming = "NO";
             CurrentRecord.direction = "Originating";
           } else if (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_MT) {
-            CurrentRecord.roamingMode = true;
+            CurrentRecord.roaming = "YES";
             CurrentRecord.direction = "Originating";
           } else if ((CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_MO)
                   || (CurrentRecord.callScenario == ArtilliumDefs.BASE_MODE_ROAM_FWD)) {
-            CurrentRecord.roamingMode = true;
+            CurrentRecord.roaming = "YES";
             CurrentRecord.direction = "Originating";
           } else {
             RecordError tmpError = new RecordError("ERR_SCENARIO_NOT_MAPPED:"

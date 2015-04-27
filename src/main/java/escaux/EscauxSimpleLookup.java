@@ -20,6 +20,7 @@ public class EscauxSimpleLookup extends AbstractRegexMatch{
 	private List<String> tmpSearchParameters;
 	private int[] keyIndexes = null;
 	private List<Field> fields;
+	private String message;
 	
 	@Override
 	public void init(String PipelineName, String ModuleName) throws InitializationException{
@@ -37,6 +38,10 @@ public class EscauxSimpleLookup extends AbstractRegexMatch{
 		String fields = PropertyUtils.getPropertyUtils().getDataCachePropertyValue("CacheFactory", cacheName, "Fields");
 		if(fields == null)
 			throw new InternalError("Cannot read property <Fields> of <" + ModuleName + ">");
+		
+		this.message = PropertyUtils.getPropertyUtils().getDataCachePropertyValue("CacheFactory", cacheName, "ErrorMessage");
+		if(this.message == null)
+			throw new InternalError("Cannot read property <ErrorMessage> of <" + ModuleName + ">");
 		
 		String[] fieldArray = fields.split(",");
 		this.fields = new ArrayList<>();
@@ -62,7 +67,6 @@ public class EscauxSimpleLookup extends AbstractRegexMatch{
 			tmpSearchParameters = new ArrayList<>();
 			for(int keyIndex : keyIndexes) {
 				tmpSearchParameters.add(currentRecord.getField(keyIndex));
-				getPipeLog().error("Looking for : " + currentRecord.getField(keyIndex));
 			}
 			
 			results = getRegexMatchWithChildData("DEF", tmpSearchParameters.toArray(new String[tmpSearchParameters.size()]));
@@ -78,7 +82,7 @@ public class EscauxSimpleLookup extends AbstractRegexMatch{
 					currentRecord.addError(new RecordError(e.getMessage(), ErrorType.FATAL));
 				}
 			} else {
-				currentRecord.addError(new RecordError("No data found", ErrorType.DATA_NOT_FOUND));
+				currentRecord.addError(new RecordError(this.message, ErrorType.DATA_NOT_FOUND));
 			}
 		}
 		

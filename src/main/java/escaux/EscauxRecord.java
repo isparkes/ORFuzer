@@ -18,24 +18,32 @@ public abstract class EscauxRecord extends RatingRecord{
 
 	// original parsed cdr fields
 	public String subscriberNumber = null;
+	public String originalPoint = null;
 	public String dialedNumber = null;
 	public int billsec = 0;
 	public int events = 0;
 	public int size = 0;
 	public String callType = null;
 	public SimpleDateFormat month;
+	public String linkedRecord = null;
+	// calculated fields
+	public String dialedNumberNorm = null;
+	public String dialingNumberNorm = null;
+	public String account = null;
+	public String destination = null;
+	public String origin = null;
+	public String callCase = null;
+	public double ratedAmount = 0;
+	public String fromZone = null;
+	public String toZone = null;
+	public String skip = null;
 	public String service = null;
 	public String type = null;
 	public String direction = null;
 	public String roaming = null;
-	public String skip = null;
-	// calculated fields
-	public String dialedNumberNorm = null;
-	public String account = null;
-	public String destination = null;
-	public String callCase = null;
-	public double ratedAmount = 0;
-	public String zone = null;
+	public String fleet = null;
+	public double priceRetail = 0.0;
+	public String priceType;
 	// Discount stuff - inputs
 	public String discount;         // The discount we want to apply
 	public String discountRUM;      // The RUM we want to discount
@@ -76,6 +84,9 @@ public abstract class EscauxRecord extends RatingRecord{
 	    tmpDumpList.add("  Service                  = <" + this.service + ">");
 	    tmpDumpList.add("  Direction                = <" + this.direction + ">");
 	    tmpDumpList.add("  Type                     = <" + this.type + ">");
+	    tmpDumpList.add("  Roaming                  = <" + this.roaming + ">");
+	    tmpDumpList.add("  Skip                     = <" + this.skip + ">");
+	    tmpDumpList.add("  Fleet                    = <" + this.fleet + ">");
 	    tmpDumpList.add("  Subscriber Number        = <" + this.subscriberNumber + ">");
 	    tmpDumpList.add("  Dialed Number            = <" + this.dialedNumber + ">");
 	    tmpDumpList.add("  Call Type                = <" + this.callType + ">");
@@ -83,11 +94,15 @@ public abstract class EscauxRecord extends RatingRecord{
 	    tmpDumpList.add("  Duration (billsec)       = <" + this.billsec + ">");
 	    tmpDumpList.add("  Session Size             = <" + this.size + ">");
 	    tmpDumpList.add("  Month                    = <" + this.month + ">");
-	    tmpDumpList.add("  Roaming                  = <" + this.roaming + ">");
 	    tmpDumpList.add("--------------------------------------");
 	    tmpDumpList.add("  Normalised Dialed Number = <" + this.dialedNumberNorm + ">");
+	    tmpDumpList.add("  Normalised Dialing Number= <" + this.dialingNumberNorm + ">");
 	    tmpDumpList.add("  Account                  = <" + this.account + ">");
+	    tmpDumpList.add("  Origin                   = <" + this.destination + ">");
 	    tmpDumpList.add("  Destination              = <" + this.destination + ">");
+	    tmpDumpList.add("  From Zone                = <" + this.fromZone + ">");
+	    tmpDumpList.add("  To Zone                  = <" + this.toZone + ">");
+	    tmpDumpList.add("  Price Type               = <" + this.priceType + ">");
 	    tmpDumpList.add("  Rated Amount             = <" + this.ratedAmount + ">");
 	    tmpDumpList.add("--------------------------------------");
 	    tmpDumpList.add("  Discount Rule            = <" + this.discountRule + ">");

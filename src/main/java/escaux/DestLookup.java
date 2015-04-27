@@ -88,6 +88,13 @@ public class DestLookup extends AbstractBestMatch {
         tmpError = new RecordError("ERR_DEST_LOOKUP_FAILED", ErrorType.SPECIAL);
         currentRecord.addError(tmpError);
       }
+      try {
+          currentRecord.origin = getBestMatch("DEF", currentRecord.dialingNumberNorm);
+          getPipeLog().debug("  orig lookup <" + currentRecord.dialingNumberNorm + "> = <" + currentRecord.origin + ">");
+        } catch (Exception e) {
+          tmpError = new RecordError("ERR_ORIG_LOOKUP_FAILED", ErrorType.SPECIAL);
+          currentRecord.addError(tmpError);
+        }
     }
 
     return r;
