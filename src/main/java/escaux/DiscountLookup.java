@@ -75,6 +75,7 @@ public class DiscountLookup extends AbstractRegexMatch {
   int IDX_RUM = 1;
   int IDX_PERIOD = 2;
   int IDX_INITIAL_VALUE = 3;
+  int IDX_COUNTER = 4;
 
   @Override
   public IRecord procValidRecord(IRecord r) {
@@ -96,7 +97,7 @@ public class DiscountLookup extends AbstractRegexMatch {
         CurrentRecord.discountRule = Results.get(IDX_RULE);
         CurrentRecord.discountRUM = Results.get(IDX_RUM);
         CurrentRecord.discountPeriod = Results.get(IDX_PERIOD);
-        
+        CurrentRecord.discountCounter = Integer.parseInt(Results.get(IDX_COUNTER));
         try {
           CurrentRecord.discountInitValue = Double.valueOf(Results.get(IDX_INITIAL_VALUE));
         } catch (NumberFormatException ex) {
