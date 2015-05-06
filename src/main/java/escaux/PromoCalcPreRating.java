@@ -70,18 +70,22 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
       }
 
       // *************************** Volume *******************************
-      if ((CurrentRecord.discountRUM.equals("VOL")) && (CurrentRecord.getRUMValue("VOL") > 0)) {
+      if ((CurrentRecord.discountRUM.equals("SIZE")) && (CurrentRecord.getRUMValue("SIZE") > 0)) {
+    	  getPipeLog().error("DISCOUNT ON SIZE");
         if (CurrentRecord.discountPeriod.equalsIgnoreCase("m")) {
+        	getPipeLog().error("==> MONTHLY DISCOUNT");
           tmpStartDate = conversionUtils.getUTCMonthStart(CurrentRecord.EventStartDate);
           tmpEndDate = conversionUtils.getUTCMonthEnd(CurrentRecord.EventStartDate);
         } else if (CurrentRecord.discountPeriod.equalsIgnoreCase("d")) {
+        	getPipeLog().error("==> DAYLY");
           tmpStartDate = conversionUtils.getUTCDayStart(CurrentRecord.EventStartDate);
           tmpEndDate = conversionUtils.getUTCDayEnd(CurrentRecord.EventStartDate);
         }
 
         // perform the discount
-        tmpDiscInfo = discountConsumeRUM(CurrentRecord, CurrentRecord.discountRule, CurrentRecord.balanceGroup, "VOL", CurrentRecord.discountCounter, CurrentRecord.discountInitValue, tmpStartDate, tmpEndDate);
-
+        tmpDiscInfo = discountConsumeRUM(CurrentRecord, CurrentRecord.discountRule, CurrentRecord.balanceGroup, "SIZE", CurrentRecord.discountCounter, CurrentRecord.discountInitValue, tmpStartDate, tmpEndDate);
+        getPipeLog().error("Discounting with <" + CurrentRecord + ";"+CurrentRecord.discountRule + ";"+CurrentRecord.balanceGroup + ";SIZE;"+ CurrentRecord.discountCounter + ";"+CurrentRecord.discountInitValue+";"+tmpStartDate+";"+tmpEndDate+">");
+        getPipeLog().error("Discount applied : " + tmpDiscInfo.isDiscountApplied());
         // put the info back in the Record
         if (tmpDiscInfo.isDiscountApplied()) {
           CurrentRecord.discountApplied = true;
@@ -89,13 +93,13 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
           CurrentRecord.discountGranted += tmpDiscInfo.getDiscountedValue();
 
           // Adjust the volume available for rating
-          double volRemaining = CurrentRecord.getRUMValue("VOL") - (tmpDiscInfo.getDiscountedValue() * (50 * 1024));
+          double volRemaining = CurrentRecord.getRUMValue("SIZE") - (tmpDiscInfo.getDiscountedValue() * (50 * 1024));
           if (volRemaining < 0) {
             // 0 is the minimum value we can use
-            CurrentRecord.setRUMValue("VOL", -CurrentRecord.getRUMValue("VOL"));
+            CurrentRecord.setRUMValue("SIZE", -CurrentRecord.getRUMValue("SIZE"));
           } else {
             // 0 is the minimum value we can use
-            CurrentRecord.setRUMValue("VOL", -(tmpDiscInfo.getDiscountedValue() * (50 * 1024)));
+            CurrentRecord.setRUMValue("SIZE", -(tmpDiscInfo.getDiscountedValue() * (50 * 1024)));
           }
 
         }
@@ -134,7 +138,7 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
 
         // perform the discount
         tmpDiscInfo = discountConsumeRUM(CurrentRecord, CurrentRecord.discountRule, CurrentRecord.balanceGroup, "EVT", CurrentRecord.discountCounter, CurrentRecord.discountInitValue, tmpStartDate, tmpEndDate);
-
+        getPipeLog().error("Discounting with <" + CurrentRecord + ";"+CurrentRecord.discountRule + ";"+CurrentRecord.balanceGroup + ";EVT;"+ CurrentRecord.discountCounter + ";"+CurrentRecord.discountInitValue+";"+tmpStartDate+";"+tmpEndDate+">");
         // put the info back in the Record
         if (tmpDiscInfo.isDiscountApplied()) {
           CurrentRecord.discountApplied = true;

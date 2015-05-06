@@ -23,7 +23,8 @@ public class ZonesLookup extends AbstractRegexMatch{
 			if(isValidRegexMatchResult(results)) {
 				currentRecord.toZone = results.get(0);
 			} else {
-				currentRecord.addError(new RecordError("Unable to determine the destination zone"));
+				if(! currentRecord.service.equals("DATA"))
+					currentRecord.addError(new RecordError("Unable to determine the destination zone"));
 			}
 			
 			tmpSearchParameters[0] = currentRecord.origin;

@@ -80,6 +80,8 @@ public class PriceLookup extends AbstractRegexMatch {
         tmpSearchParameters[2] = currentRecord.fromZone;
         tmpSearchParameters[3] = currentRecord.toZone;
         
+        getPipeLog().error("Trying to find the price for a <" + currentRecord.direction + "> <" + currentRecord.service + ">, which is <" + currentRecord.type + ">, FROM <" + currentRecord.fromZone + ">, TO <" + currentRecord.toZone + ">");
+        
         // Find the price group and place them into the charge packets
         for (ChargePacket tmpCP : currentRecord.getChargePackets()) {
           if (tmpCP.Valid) {

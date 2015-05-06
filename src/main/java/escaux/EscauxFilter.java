@@ -47,7 +47,8 @@ public class EscauxFilter extends AbstractStubPlugIn{
 					getPipeLog().error("=> Looking if record field <" + this.field + "> is <" + value + ">");
 					if(value.equals(currentRecord.getField(this.field))) {
 						getPipeLog().error("=> It is...");
-						currentRecord.addError(new RecordError("Dropped because field index <" + this.field + "> = <" + value + ">" ));
+						//currentRecord.addError(new RecordError("Dropped because field index <" + this.field + "> = <" + value + ">" ));
+						currentRecord.visibility = "NO";
 					}
 				}
 			}

@@ -86,7 +86,8 @@ public class DestLookup extends AbstractBestMatch {
         getPipeLog().debug("  dest lookup <" + currentRecord.dialedNumberNorm + "> = <" + currentRecord.destination + ">");
       } catch (Exception e) {
         tmpError = new RecordError("ERR_DEST_LOOKUP_FAILED", ErrorType.SPECIAL);
-        currentRecord.addError(tmpError);
+        if(! currentRecord.service.equals("DATA"))
+        	currentRecord.addError(tmpError);
       }
       try {
           currentRecord.origin = getBestMatch("DEF", currentRecord.dialingNumberNorm);

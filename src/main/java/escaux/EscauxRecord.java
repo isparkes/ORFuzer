@@ -34,14 +34,13 @@ public abstract class EscauxRecord extends RatingRecord{
 	public String origin = null;
 	public String callCase = null;
 	public double ratedAmount = 0;
-	public String fromZone = null;
-	public String toZone = null;
-	public String skip = null;
+	public String fromZone = "UNKNOWN";
+	public String toZone = "UNKNOWN";
 	public String service = null;
 	public String type = null;
 	public String direction = null;
-	public String roaming = null;
-	public String fleet = null;
+	public String roaming = "NO";
+	public String fleet = "NO";
 	public double priceRetail = 0.0;
 	public String priceType;
 	// Discount stuff - inputs
@@ -56,7 +55,7 @@ public abstract class EscauxRecord extends RatingRecord{
 	public String discountRule;
 	public long balanceGroup;
 	public int discountCounter;
-	public String visibility;
+	public String visibility = "YES";
 	
 	public EscauxRecord() {
 		super();
@@ -85,7 +84,6 @@ public abstract class EscauxRecord extends RatingRecord{
 	    tmpDumpList.add("  Direction                = <" + this.direction + ">");
 	    tmpDumpList.add("  Type                     = <" + this.type + ">");
 	    tmpDumpList.add("  Roaming                  = <" + this.roaming + ">");
-	    tmpDumpList.add("  Skip                     = <" + this.skip + ">");
 	    tmpDumpList.add("  Fleet                    = <" + this.fleet + ">");
 	    tmpDumpList.add("  Subscriber Number        = <" + this.subscriberNumber + ">");
 	    tmpDumpList.add("  Dialed Number            = <" + this.dialedNumber + ">");

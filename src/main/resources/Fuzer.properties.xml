@@ -255,7 +255,7 @@
           <ClassName>OpenRate.cache.RegexMatchCache</ClassName>
           <DataSourceType>File</DataSourceType>
           <DataFile>ConfigData/discounts.dat</DataFile>
-          <KeyFields>1</KeyFields>
+          <KeyFields>3</KeyFields>
         </DiscountLookupCache>
 
         <BalCache>

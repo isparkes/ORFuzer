@@ -96,7 +96,8 @@ public class CdrdbOutputAdapter
     tmpInRecord = (EscauxRecord) r;
     
     tmpOutRecord.setData(tmpInRecord.unmapOriginalData());
-    Outbatch.add((IRecord) tmpOutRecord);
+    if(! "NO".equals(tmpInRecord.visibility))
+    	Outbatch.add((IRecord) tmpOutRecord);
 
     getPipeLog().debug("writing cdr " + tmpOutRecord.RecordNumber);
 

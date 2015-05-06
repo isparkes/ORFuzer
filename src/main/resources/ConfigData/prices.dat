@@ -29,3 +29,9 @@ SMS;OUTGOING;.*;USA;WORLD2;SMS_ROAMING_USA_WORLD2
 SMS;OUTGOING;.*;USA;USA;SMS_ROAMING_USA_USA
 #INCOMING
 SMS;INCOMING;.*;.*;.*;SMS_FREE
+#### DATA ###
+DATA;(.*|^$);(.*|^$);NATIONAL;(.*|^$|null);DATA_NATIONAL
+DATA;(.*|^$);(.*|^$);EUROPE;(.*|^$|null);DATA_ROAMING_EUROPE
+DATA;(.*|^$);(.*|^$);WORLD1;(.*|^$|null);DATA_ROAMING_WORLD1
+DATA;(.*|^$);(.*|^$);WORLD2;(.*|^$|null);DATA_ROAMING_WORLD2
+DATA;(.*|^$);(.*|^$);USA;(.*|^$|null);DATA_ROAMING_USA
