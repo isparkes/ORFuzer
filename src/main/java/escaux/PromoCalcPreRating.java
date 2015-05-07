@@ -57,51 +57,28 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
           CurrentRecord.discountRecId = tmpDiscInfo.getRecId();
           CurrentRecord.discountGranted += tmpDiscInfo.getDiscountedValue();
 
-          // Adjust the duration available for rating
-          double durRemaining = CurrentRecord.getRUMValue("DUR") - (tmpDiscInfo.getDiscountedValue() * 60);
-          if (durRemaining < 0) {
-            // 0 is the minimum value we can use
-            CurrentRecord.updateRUMValue("DUR", -CurrentRecord.getRUMValue("DUR"));
-          } else {
-            // 0 is the minimum value we can use
-            CurrentRecord.updateRUMValue("DUR", -tmpDiscInfo.getDiscountedValue() * 60);
-          }
+          /* There is no need to manually discount anything, the OpenRate engine already does it! */
         }
       }
 
       // *************************** Volume *******************************
       if ((CurrentRecord.discountRUM.equals("SIZE")) && (CurrentRecord.getRUMValue("SIZE") > 0)) {
-    	  getPipeLog().error("DISCOUNT ON SIZE");
-        if (CurrentRecord.discountPeriod.equalsIgnoreCase("m")) {
-        	getPipeLog().error("==> MONTHLY DISCOUNT");
+        if (CurrentRecord.discountPeriod.equalsIgnoreCase("m")) {	
           tmpStartDate = conversionUtils.getUTCMonthStart(CurrentRecord.EventStartDate);
           tmpEndDate = conversionUtils.getUTCMonthEnd(CurrentRecord.EventStartDate);
         } else if (CurrentRecord.discountPeriod.equalsIgnoreCase("d")) {
-        	getPipeLog().error("==> DAYLY");
           tmpStartDate = conversionUtils.getUTCDayStart(CurrentRecord.EventStartDate);
           tmpEndDate = conversionUtils.getUTCDayEnd(CurrentRecord.EventStartDate);
         }
 
         // perform the discount
         tmpDiscInfo = discountConsumeRUM(CurrentRecord, CurrentRecord.discountRule, CurrentRecord.balanceGroup, "SIZE", CurrentRecord.discountCounter, CurrentRecord.discountInitValue, tmpStartDate, tmpEndDate);
-        getPipeLog().error("Discounting with <" + CurrentRecord + ";"+CurrentRecord.discountRule + ";"+CurrentRecord.balanceGroup + ";SIZE;"+ CurrentRecord.discountCounter + ";"+CurrentRecord.discountInitValue+";"+tmpStartDate+";"+tmpEndDate+">");
-        getPipeLog().error("Discount applied : " + tmpDiscInfo.isDiscountApplied());
         // put the info back in the Record
         if (tmpDiscInfo.isDiscountApplied()) {
           CurrentRecord.discountApplied = true;
           CurrentRecord.discountRecId = tmpDiscInfo.getRecId();
           CurrentRecord.discountGranted += tmpDiscInfo.getDiscountedValue();
-
-          // Adjust the volume available for rating
-          double volRemaining = CurrentRecord.getRUMValue("SIZE") - (tmpDiscInfo.getDiscountedValue() * (50 * 1024));
-          if (volRemaining < 0) {
-            // 0 is the minimum value we can use
-            CurrentRecord.setRUMValue("SIZE", -CurrentRecord.getRUMValue("SIZE"));
-          } else {
-            // 0 is the minimum value we can use
-            CurrentRecord.setRUMValue("SIZE", -(tmpDiscInfo.getDiscountedValue() * (50 * 1024)));
-          }
-
+          /* There is no need to manually discount anything, the OpenRate engine already does it! */
         }
       }
       
@@ -138,7 +115,6 @@ public class PromoCalcPreRating extends AbstractBalanceHandlerPlugIn {
 
         // perform the discount
         tmpDiscInfo = discountConsumeRUM(CurrentRecord, CurrentRecord.discountRule, CurrentRecord.balanceGroup, "EVT", CurrentRecord.discountCounter, CurrentRecord.discountInitValue, tmpStartDate, tmpEndDate);
-        getPipeLog().error("Discounting with <" + CurrentRecord + ";"+CurrentRecord.discountRule + ";"+CurrentRecord.balanceGroup + ";EVT;"+ CurrentRecord.discountCounter + ";"+CurrentRecord.discountInitValue+";"+tmpStartDate+";"+tmpEndDate+">");
         // put the info back in the Record
         if (tmpDiscInfo.isDiscountApplied()) {
           CurrentRecord.discountApplied = true;

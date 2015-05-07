@@ -89,11 +89,9 @@ public class DiscountLookup extends AbstractRegexMatch {
       tmpSearchParameters[0] = CurrentRecord.service;
       tmpSearchParameters[1] = CurrentRecord.type;
       tmpSearchParameters[2] = CurrentRecord.fleet;
-      getPipeLog().error("Looking for : <"+CurrentRecord.account+";"+CurrentRecord.service + ";"+CurrentRecord.type+";"+CurrentRecord.fleet+";>");
       Results = getRegexMatchWithChildData(CurrentRecord.account, tmpSearchParameters);
 
       if (this.isValidRegexMatchResult(Results)) {
-    	getPipeLog().error("Ok, we have a valid discount!");
         CurrentRecord.discountRule = Results.get(IDX_RULE);
         CurrentRecord.discountRUM = Results.get(IDX_RUM);
         CurrentRecord.discountPeriod = Results.get(IDX_PERIOD);

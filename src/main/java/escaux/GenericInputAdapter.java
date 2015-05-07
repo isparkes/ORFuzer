@@ -57,6 +57,7 @@ package escaux;
 import OpenRate.adapter.file.FlatFileInputAdapter;
 import OpenRate.record.FlatRecord;
 import OpenRate.record.IRecord;
+import OpenRate.utils.PropertyUtils;
 import artillium.ArtilliumRecord;
 
 /**

@@ -42,12 +42,8 @@ public class EscauxFilter extends AbstractStubPlugIn{
 		if(currentRecord.RECORD_TYPE == EscauxRecord.DETAIL_RECORD) {
 			getPipeLog().error("Looking if we can skip that record");
 			if("SMS".equals(currentRecord.service) && "PREMIUM".equals(currentRecord.type)) {
-				getPipeLog().error("=> Record is SMS PREMIUM");
 				for(String value : values) {
-					getPipeLog().error("=> Looking if record field <" + this.field + "> is <" + value + ">");
 					if(value.equals(currentRecord.getField(this.field))) {
-						getPipeLog().error("=> It is...");
-						//currentRecord.addError(new RecordError("Dropped because field index <" + this.field + "> = <" + value + ">" ));
 						currentRecord.visibility = "NO";
 					}
 				}

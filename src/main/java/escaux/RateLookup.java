@@ -10,7 +10,7 @@ public class RateLookup extends AbstractRUMRateCalc {
 
   @Override
   public IRecord procValidRecord(IRecord r) {
-    int Index;
+    int index;
     ChargePacket tmpCP;
     EscauxRecord CurrentRecord;
     RecordError tmpError;
@@ -24,8 +24,8 @@ public class RateLookup extends AbstractRUMRateCalc {
         CurrentRecord.addError(tmpError);
       }
 
-      for (Index = 0; Index < CurrentRecord.getChargePacketCount(); Index++) {
-        tmpCP = CurrentRecord.getChargePacket(Index);
+      for (index = 0; index < CurrentRecord.getChargePacketCount(); index++) {
+        tmpCP = CurrentRecord.getChargePacket(index);
         CurrentRecord.ratedAmount += tmpCP.chargedValue;
       }
     }
