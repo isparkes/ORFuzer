@@ -55,6 +55,7 @@
 package escaux;
 
 import OpenRate.adapter.file.FlatFileInputAdapter;
+import OpenRate.exception.InitializationException;
 import OpenRate.record.FlatRecord;
 import OpenRate.record.IRecord;
 import OpenRate.utils.PropertyUtils;
@@ -69,16 +70,19 @@ import artillium.ArtilliumRecord;
  * file, but in this simplest possible case, it just create a bunch of records
  * out of thin air and passes them on to the pipeline.
  */
-public class GenericInputAdapter
+public abstract class GenericInputAdapter
         extends FlatFileInputAdapter {
 
   private int intRecordNumber;
+  private Class<?> recordClass;
   /**
    * Constructor for SimpleInputAdapter.
    */
-  public GenericInputAdapter() {
+  public GenericInputAdapter(){
 	  super();
   }
+  
+  public abstract EscauxRecord getNewRecord();
 
   // -----------------------------------------------------------------------------
   // ------------------ Start of inherited Plug In functions ---------------------
@@ -128,7 +132,12 @@ public class GenericInputAdapter
 
     // Get the data we are goingt to work on from the input record
     tmpData = tmpFlatRecord.getData();
-	tmpDataRecord = new ArtilliumRecord();
+	try {
+		tmpDataRecord = getNewRecord();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		throw new InternalError("FATAL: <" + recordClass.getName() + "> cannot be instanced");
+	}
 	// Set the data into the record
 	tmpDataRecord.setOriginalData(tmpData);
 	// Map the data, parsing it into the fields

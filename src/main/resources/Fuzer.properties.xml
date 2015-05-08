@@ -28,7 +28,7 @@
            record level processing cannot continue, usually triggered explicitly
            in your processing -->
       <SInpAdapter>
-        <ClassName>escaux.GenericInputAdapter</ClassName>
+        <ClassName>artillium.ArtilliumInputAdapter</ClassName>
         <BatchSize>5000</BatchSize>
         <InputFilePath>Data</InputFilePath>
         <InputFilePrefix></InputFilePrefix>
